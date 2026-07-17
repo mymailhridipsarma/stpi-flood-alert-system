@@ -53,7 +53,7 @@ export default function History({ statusLogs }) {
             background: 'linear-gradient(135deg, rgba(0, 242, 254, 0.2) 0%, rgba(79, 172, 254, 0.1) 100%)',
             border: '1px solid rgba(0, 242, 254, 0.3)',
             borderRadius: '12px',
-            color: '#00f2fe',
+            color: 'hsl(var(--primary))',
             fontWeight: 600,
             cursor: 'pointer',
             transition: 'var(--transition-smooth)'
@@ -82,7 +82,7 @@ export default function History({ statusLogs }) {
               borderRadius: '10px',
               border: '1px solid hsl(var(--border))',
               backgroundColor: 'rgba(0, 0, 0, 0.2)',
-              color: '#fff',
+              color: 'hsl(var(--text-primary))',
               fontSize: '0.9rem',
               outline: 'none'
             }}
@@ -101,7 +101,7 @@ export default function History({ statusLogs }) {
               borderRadius: '10px',
               border: '1px solid hsl(var(--border))',
               backgroundColor: 'rgba(0, 0, 0, 0.2)',
-              color: '#fff',
+              color: 'hsl(var(--text-primary))',
               fontSize: '0.9rem',
               outline: 'none',
               appearance: 'none',
@@ -135,7 +135,7 @@ export default function History({ statusLogs }) {
             <tbody>
               {filteredLogs.map((log, idx) => (
                 <tr key={log.id || idx}>
-                  <td style={{ fontWeight: 600, color: '#fff' }}>{log.device_id}</td>
+                  <td style={{ fontWeight: 600, color: 'hsl(var(--text-primary))' }}>{log.device_id}</td>
                   <td>{log.water_level_cm.toFixed(1)} cm</td>
                   <td>
                     <span className={`badge ${

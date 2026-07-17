@@ -45,7 +45,7 @@ export default function Analytics({ statusLogs }) {
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#0f172a', borderColor: 'hsl(var(--border))' }}
                 />
-                <Bar dataKey="counts" fill="#00f2fe" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="counts" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

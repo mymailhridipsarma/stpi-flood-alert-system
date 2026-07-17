@@ -27,8 +27,8 @@ export default function HistoryChart({ data }) {
         >
           <defs>
             <linearGradient id="colorLevel" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#00f2fe" stopOpacity={0.4}/>
-              <stop offset="95%" stopColor="#00f2fe" stopOpacity={0}/>
+              <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4}/>
+              <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
@@ -48,14 +48,14 @@ export default function HistoryChart({ data }) {
             contentStyle={{ 
               backgroundColor: '#0f172a', 
               borderColor: 'hsl(var(--border))',
-              color: '#fff',
+              color: 'hsl(var(--text-primary))',
               borderRadius: '8px'
             }} 
           />
           <Area 
             type="natural" 
             dataKey="Water Height (cm)" 
-            stroke="#00f2fe" 
+            stroke="hsl(var(--primary))" 
             strokeWidth={2}
             fillOpacity={1} 
             fill="url(#colorLevel)"

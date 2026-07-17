@@ -28,7 +28,7 @@ export default function Camera({ detections, statusLogs }) {
         <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <h3 style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <CamIcon size={20} style={{ color: '#00f2fe' }} />
+              <CamIcon size={20} style={{ color: 'hsl(var(--primary))' }} />
               Latest Snapshot
             </h3>
             <span style={{ fontSize: '0.8rem', color: 'hsl(var(--text-muted))', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -108,7 +108,7 @@ export default function Camera({ detections, statusLogs }) {
               border: '1px solid hsl(var(--border))'
             }}>
               <span style={{ fontSize: '0.75rem', color: 'hsl(var(--text-muted))' }}>Detected Hazard</span>
-              <p style={{ fontWeight: 700, fontSize: '1.1rem', color: '#fff', marginTop: '4px' }}>
+              <p style={{ fontWeight: 700, fontSize: '1.1rem', color: 'hsl(var(--text-primary))', marginTop: '4px' }}>
                 {activeObj?.object_name ? activeObj.object_name.toUpperCase() : 'NONE'}
               </p>
             </div>
@@ -159,7 +159,7 @@ export default function Camera({ detections, statusLogs }) {
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <span style={{ fontWeight: 700, fontSize: '0.9rem', color: '#fff' }}>{det.object_name.toUpperCase()}</span>
+                    <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'hsl(var(--text-primary))' }}>{det.object_name.toUpperCase()}</span>
                     <span style={{ 
                       fontSize: '0.8rem', 
                       fontWeight: 600, 

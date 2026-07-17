@@ -34,22 +34,22 @@ export default function DeviceStatus({ devices, statusLogs }) {
         {/* Device Specifications */}
         <div className="glass-panel" style={{ padding: '24px' }}>
           <h3 style={{ marginBottom: '20px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Cpu size={20} style={{ color: '#00f2fe' }} />
+            <Cpu size={20} style={{ color: 'hsl(var(--primary))' }} />
             Main Controller specs
           </h3>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '12px' }}>
               <span style={{ color: 'hsl(var(--text-secondary))' }}>Device Name</span>
-              <span style={{ fontWeight: 600, color: '#fff' }}>{device.name}</span>
+              <span style={{ fontWeight: 600, color: 'hsl(var(--text-primary))' }}>{device.name}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '12px' }}>
               <span style={{ color: 'hsl(var(--text-secondary))' }}>Device ID</span>
-              <span style={{ fontWeight: 600, color: '#fff' }}>{device.device_id}</span>
+              <span style={{ fontWeight: 600, color: 'hsl(var(--text-primary))' }}>{device.device_id}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '12px' }}>
               <span style={{ color: 'hsl(var(--text-secondary))' }}>Firmware Version</span>
-              <span style={{ fontWeight: 600, color: '#00f2fe' }}>v2.0.4-OTA</span>
+              <span style={{ fontWeight: 600, color: 'hsl(var(--primary))' }}>v2.0.4-OTA</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '12px' }}>
               <span style={{ color: 'hsl(var(--text-secondary))' }}>Status</span>
@@ -62,7 +62,7 @@ export default function DeviceStatus({ devices, statusLogs }) {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '12px' }}>
               <span style={{ color: 'hsl(var(--text-secondary))' }}>Last Heartbeat</span>
-              <span style={{ fontWeight: 600, color: '#fff' }}>
+              <span style={{ fontWeight: 600, color: 'hsl(var(--text-primary))' }}>
                 {new Date(device.last_seen).toLocaleString()}
               </span>
             </div>
@@ -72,7 +72,7 @@ export default function DeviceStatus({ devices, statusLogs }) {
         {/* Connectivity and Cache */}
         <div className="glass-panel" style={{ padding: '24px' }}>
           <h3 style={{ marginBottom: '20px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Wifi size={20} style={{ color: '#00f2fe' }} />
+            <Wifi size={20} style={{ color: 'hsl(var(--primary))' }} />
             Network & Offline Cache
           </h3>
 
@@ -80,7 +80,7 @@ export default function DeviceStatus({ devices, statusLogs }) {
 
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '12px' }}>
               <span style={{ color: 'hsl(var(--text-secondary))' }}>Offline Flash Storage cache</span>
-              <span style={{ fontWeight: 600, color: '#fff' }}>0 / 512 KB</span>
+              <span style={{ fontWeight: 600, color: 'hsl(var(--text-primary))' }}>0 / 512 KB</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '12px' }}>
               <span style={{ color: 'hsl(var(--text-secondary))' }}>Queued Records (Offline Mode)</span>
@@ -96,29 +96,29 @@ export default function DeviceStatus({ devices, statusLogs }) {
         {/* Pinout & GPIO Diagnostics */}
         <div className="glass-panel" style={{ padding: '24px', gridColumn: 'span 2' }}>
           <h3 style={{ marginBottom: '20px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Activity size={20} style={{ color: '#00f2fe' }} />
+            <Activity size={20} style={{ color: 'hsl(var(--primary))' }} />
             Active GPIO Pin Diagnostics
           </h3>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
             <div style={{ padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid hsl(var(--border))' }}>
               <p style={{ fontSize: '0.75rem', color: 'hsl(var(--text-muted))' }}>Ultrasonic (Trig / Echo)</p>
-              <p style={{ fontWeight: 600, color: '#fff', marginTop: '4px' }}>GPIO 5 / GPIO 18</p>
+              <p style={{ fontWeight: 600, color: 'hsl(var(--text-primary))', marginTop: '4px' }}>GPIO 5 / GPIO 18</p>
               <span style={{ fontSize: '0.7rem', color: '#10b981' }}>● OPERATIONAL</span>
             </div>
             <div style={{ padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid hsl(var(--border))' }}>
               <p style={{ fontSize: '0.75rem', color: 'hsl(var(--text-muted))' }}>GPS Module (RX / TX)</p>
-              <p style={{ fontWeight: 600, color: '#fff', marginTop: '4px' }}>GPIO 16 / GPIO 17</p>
+              <p style={{ fontWeight: 600, color: 'hsl(var(--text-primary))', marginTop: '4px' }}>GPIO 16 / GPIO 17</p>
               <span style={{ fontSize: '0.7rem', color: '#10b981' }}>● GPS SYNC: OK</span>
             </div>
             <div style={{ padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid hsl(var(--border))' }}>
               <p style={{ fontSize: '0.75rem', color: 'hsl(var(--text-muted))' }}>Display (I2C SDA / SCL)</p>
-              <p style={{ fontWeight: 600, color: '#fff', marginTop: '4px' }}>GPIO 21 / GPIO 22</p>
+              <p style={{ fontWeight: 600, color: 'hsl(var(--text-primary))', marginTop: '4px' }}>GPIO 21 / GPIO 22</p>
               <span style={{ fontSize: '0.7rem', color: '#10b981' }}>● LCD Addr: 0x27</span>
             </div>
             <div style={{ padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid hsl(var(--border))' }}>
               <p style={{ fontSize: '0.75rem', color: 'hsl(var(--text-muted))' }}>LED & Buzzer Indicators</p>
-              <p style={{ fontWeight: 600, color: '#fff', marginTop: '4px' }}>Pins 12, 14, 27, 26</p>
+              <p style={{ fontWeight: 600, color: 'hsl(var(--text-primary))', marginTop: '4px' }}>Pins 12, 14, 27, 26</p>
               <span style={{ fontSize: '0.7rem', color: '#10b981' }}>● ONLINE</span>
             </div>
           </div>

@@ -75,7 +75,7 @@ export default function LiveMap({ devices }) {
       case 'SAFE': return '#10b981'; // Green
       case 'RISKY': return '#f59e0b'; // Yellow
       case 'DANGER': return '#ef4444'; // Red
-      default: return '#00f2fe';     // Cyan
+      default: return 'hsl(var(--primary))';     // Cyan
     }
   };
 
@@ -101,7 +101,7 @@ export default function LiveMap({ devices }) {
             pathOptions={{ color: '#ef4444', weight: 4, opacity: 0.9, dashArray: '10, 8' }}
           >
             <Tooltip direction="top" sticky className="route-label">
-              <div style={{ background: '#ef4444', color: '#fff', padding: '6px 12px', borderRadius: '4px', fontWeight: 'bold' }}>
+              <div style={{ background: '#ef4444', color: 'hsl(var(--text-primary))', padding: '6px 12px', borderRadius: '4px', fontWeight: 'bold' }}>
                 Emergency Bypass
               </div>
             </Tooltip>
@@ -116,7 +116,7 @@ export default function LiveMap({ devices }) {
             pathOptions={{ color: '#10b981', weight: 5, opacity: 0.9 }}
           >
             <Tooltip direction="top" sticky className="route-label">
-              <div style={{ background: '#10b981', color: '#fff', padding: '6px 12px', borderRadius: '4px', fontWeight: 'bold' }}>
+              <div style={{ background: '#10b981', color: 'hsl(var(--text-primary))', padding: '6px 12px', borderRadius: '4px', fontWeight: 'bold' }}>
                 Primary Route
               </div>
             </Tooltip>
@@ -144,7 +144,7 @@ export default function LiveMap({ devices }) {
             }}
           >
             <Popup>
-              <div style={{ color: '#fff', background: '#0e1726', padding: '4px', fontFamily: 'sans-serif' }}>
+              <div style={{ color: 'hsl(var(--text-primary))', background: '#0e1726', padding: '4px', fontFamily: 'sans-serif' }}>
                 <h4 style={{ margin: '0 0 6px 0', borderBottom: '1px solid #222' }}>{device.name}</h4>
                 <p style={{ margin: '0 0 4px 0' }}><b>Status:</b> <span style={{ color: getMarkerColor(status), fontWeight: 'bold' }}>{status}</span></p>
               </div>

@@ -44,7 +44,7 @@ export default function Admin() {
         {/* Water Level Threshold Config */}
         <div className="glass-panel" style={{ padding: '24px' }}>
           <h3 style={{ marginBottom: '20px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <ShieldAlert size={20} style={{ color: '#00f2fe' }} />
+            <ShieldAlert size={20} style={{ color: 'hsl(var(--primary))' }} />
             Flood Alert Thresholds
           </h3>
           <form onSubmit={saveThresholds} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -62,7 +62,7 @@ export default function Admin() {
                   borderRadius: '8px',
                   border: '1px solid hsl(var(--border))',
                   backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                  color: '#fff',
+                  color: 'hsl(var(--text-primary))',
                   outline: 'none'
                 }}
               />
@@ -81,7 +81,7 @@ export default function Admin() {
                   borderRadius: '8px',
                   border: '1px solid hsl(var(--border))',
                   backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                  color: '#fff',
+                  color: 'hsl(var(--text-primary))',
                   outline: 'none'
                 }}
               />
@@ -98,7 +98,7 @@ export default function Admin() {
                 background: 'linear-gradient(135deg, rgba(0, 242, 254, 0.2) 0%, rgba(79, 172, 254, 0.1) 100%)',
                 border: '1px solid rgba(0, 242, 254, 0.3)',
                 borderRadius: '8px',
-                color: '#00f2fe',
+                color: 'hsl(var(--primary))',
                 fontWeight: 600,
                 cursor: 'pointer',
                 marginTop: '8px'
@@ -113,7 +113,7 @@ export default function Admin() {
         {/* Emergency Contacts */}
         <div className="glass-panel" style={{ padding: '24px' }}>
           <h3 style={{ marginBottom: '20px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Phone size={20} style={{ color: '#00f2fe' }} />
+            <Phone size={20} style={{ color: 'hsl(var(--primary))' }} />
             Emergency Contacts (SMS Broadcast)
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
@@ -131,7 +131,7 @@ export default function Admin() {
                 }}
               >
                 <div>
-                  <p style={{ fontWeight: 600, fontSize: '0.9rem', color: '#fff' }}>{contact.name}</p>
+                  <p style={{ fontWeight: 600, fontSize: '0.9rem', color: 'hsl(var(--text-primary))' }}>{contact.name}</p>
                   <p style={{ fontSize: '0.75rem', color: 'hsl(var(--text-secondary))' }}>{contact.phone} ({contact.type})</p>
                 </div>
                 <button 
@@ -163,7 +163,7 @@ export default function Admin() {
                 borderRadius: '6px',
                 border: '1px solid hsl(var(--border))',
                 backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                color: '#fff',
+                color: 'hsl(var(--text-primary))',
                 fontSize: '0.85rem',
                 outline: 'none'
               }}
@@ -179,7 +179,7 @@ export default function Admin() {
                 borderRadius: '6px',
                 border: '1px solid hsl(var(--border))',
                 backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                color: '#fff',
+                color: 'hsl(var(--text-primary))',
                 fontSize: '0.85rem',
                 outline: 'none'
               }}
@@ -192,7 +192,7 @@ export default function Admin() {
                 background: 'rgba(255, 255, 255, 0.05)',
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '6px',
-                color: '#fff',
+                color: 'hsl(var(--text-primary))',
                 fontWeight: 600,
                 fontSize: '0.85rem',
                 cursor: 'pointer'
@@ -206,7 +206,7 @@ export default function Admin() {
         {/* Global System Integration */}
         <div className="glass-panel" style={{ padding: '24px', gridColumn: 'span 2' }}>
           <h3 style={{ marginBottom: '20px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <BellRing size={20} style={{ color: '#00f2fe' }} />
+            <BellRing size={20} style={{ color: 'hsl(var(--primary))' }} />
             Notification Broadcast Settings
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
@@ -217,7 +217,7 @@ export default function Admin() {
                 onChange={(e) => setAlertConfig({ ...alertConfig, sendSms: e.target.checked })}
                 style={{ width: '18px', height: '18px' }}
               />
-              <span style={{ fontSize: '0.9rem', color: '#fff' }}>Enable SMS Broadcasts</span>
+              <span style={{ fontSize: '0.9rem', color: 'hsl(var(--text-primary))' }}>Enable SMS Broadcasts</span>
             </label>
             <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
               <input 
@@ -226,7 +226,7 @@ export default function Admin() {
                 onChange={(e) => setAlertConfig({ ...alertConfig, sendPush: e.target.checked })}
                 style={{ width: '18px', height: '18px' }}
               />
-              <span style={{ fontSize: '0.9rem', color: '#fff' }}>Enable Mobile Push Notifications</span>
+              <span style={{ fontSize: '0.9rem', color: 'hsl(var(--text-primary))' }}>Enable Mobile Push Notifications</span>
             </label>
             <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
               <input 
@@ -235,7 +235,7 @@ export default function Admin() {
                 onChange={(e) => setAlertConfig({ ...alertConfig, soundSiren: e.target.checked })}
                 style={{ width: '18px', height: '18px' }}
               />
-              <span style={{ fontSize: '0.9rem', color: '#fff' }}>Enable Local Active Buzzer Siren</span>
+              <span style={{ fontSize: '0.9rem', color: 'hsl(var(--text-primary))' }}>Enable Local Active Buzzer Siren</span>
             </label>
           </div>
         </div>
