@@ -26,7 +26,9 @@ float UltrasonicSensor::readDistanceCm() {
     long duration = pulseIn(echoPin, HIGH, 30000);
 
     if (duration == 0) {
-        return -1.0; // Timeout or sensor disconnected
+        // Timeout means the target is too far away to echo back in time.
+        // For a flood sensor, "too far away" means NO WATER (Maximum Safe).
+        return maxDistanceCm;
     }
 
     // Sound speed = 340 m/s = 0.034 cm/microsecond
@@ -34,7 +36,7 @@ float UltrasonicSensor::readDistanceCm() {
 
     // Check bounds
     if (distance > maxDistanceCm) {
-        return -1.0; // Reading outside valid operating range
+        return maxDistanceCm; // Cap at max safe distance
     }
     
     // If distance is extremely low (under 2cm), the object/water is practically touching the sensor.
