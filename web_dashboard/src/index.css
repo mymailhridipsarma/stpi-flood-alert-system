@@ -266,12 +266,21 @@ body {
 
 @keyframes danger-bg-pulse {
   0% {
-    background-color: hsl(var(--bg-primary));
-    box-shadow: inset 0 0 100px rgba(225, 29, 72, 0.02);
+    box-shadow: inset 0 0 20px rgba(225, 29, 72, 0);
   }
   100% {
-    background-color: rgba(225, 29, 72, 0.04);
-    box-shadow: inset 0 0 150px rgba(225, 29, 72, 0.15);
+    background-color: rgba(225, 29, 72, 0.05);
+    box-shadow: inset 0 0 120px rgba(225, 29, 72, 0.1);
+  }
+}
+
+@keyframes safe-bg-breath {
+  0% {
+    box-shadow: inset 0 0 20px rgba(16, 185, 129, 0);
+  }
+  100% {
+    background-color: rgba(16, 185, 129, 0.05);
+    box-shadow: inset 0 0 100px rgba(16, 185, 129, 0.15);
   }
 }
 
@@ -321,7 +330,11 @@ body {
 /* Dynamic App Container Status Classes */
 .status-danger .main-content {
   background-image: radial-gradient(rgba(225, 29, 72, 0.1) 1px, transparent 1px);
-  animation: danger-bg-pulse 2s infinite alternate ease-in-out;
+  animation: danger-bg-pulse 0.8s infinite alternate ease-in-out;
+}
+
+.status-danger .sidebar {
+  animation: danger-bg-pulse 0.8s infinite alternate ease-in-out;
 }
 .status-risky .main-content {
   background-color: hsl(var(--bg-primary));
@@ -329,6 +342,10 @@ body {
   box-shadow: inset 0 0 100px rgba(245, 158, 11, 0.05);
 }
 .status-safe .main-content {
-  background-color: hsl(var(--bg-primary));
   background-image: radial-gradient(rgba(16, 185, 129, 0.05) 1px, transparent 1px);
+  animation: safe-bg-breath 3s infinite alternate ease-in-out;
+}
+
+.status-safe .sidebar {
+  animation: safe-bg-breath 3s infinite alternate ease-in-out;
 }

@@ -24,7 +24,36 @@ export default function Camera({ detections, statusLogs }) {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '24px' }}>
         
-        {/* Live Snapshots Monitor */}
+        {/* Live Local Video Stream */}
+        <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gridColumn: '1 / -1' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Eye size={20} style={{ color: 'hsl(var(--primary))' }} />
+              Live Camera Stream (Direct LAN)
+            </h3>
+            <span style={{ fontSize: '0.85rem', color: 'hsl(var(--text-muted))', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <ShieldCheck size={14} style={{ color: 'hsl(var(--safe))' }} />
+              Requires Wi-Fi: "CAM" | Pass: "12345678"
+            </span>
+          </div>
+          <div style={{ 
+            borderRadius: '12px', 
+            overflow: 'hidden', 
+            border: '1px solid hsl(var(--border))', 
+            backgroundColor: '#000',
+            aspectRatio: '21/9',
+            position: 'relative'
+          }}>
+            <iframe 
+               src="http://192.168.4.1" 
+               title="ESP32-CAM Live Stream"
+               style={{ width: '100%', height: '100%', border: 'none' }}
+               sandbox="allow-scripts allow-same-origin"
+            />
+          </div>
+        </div>
+
+        {/* AI Cloud Snapshots Monitor */}
         <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <h3 style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
