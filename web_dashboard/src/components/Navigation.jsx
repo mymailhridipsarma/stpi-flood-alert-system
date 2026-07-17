@@ -4,7 +4,6 @@ import {
   Map, 
   BarChart3, 
   History, 
-  Camera, 
   Activity, 
   Settings, 
   Waves 
@@ -15,7 +14,6 @@ const navItems = [
   { id: 'map', name: 'Live Map', icon: Map },
   { id: 'analytics', name: 'Analytics', icon: BarChart3 },
   { id: 'history', name: 'History', icon: History },
-  { id: 'camera', name: 'Camera Feed', icon: Camera },
   { id: 'status', name: 'Device Status', icon: Activity },
   { id: 'admin', name: 'Admin Control', icon: Settings },
 ];

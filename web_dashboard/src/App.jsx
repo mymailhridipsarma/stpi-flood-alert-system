@@ -4,7 +4,6 @@ import Dashboard from './pages/Dashboard';
 import MapView from './pages/MapView';
 import Analytics from './pages/Analytics';
 import History from './pages/History';
-import Camera from './pages/Camera';
 import DeviceStatus from './pages/DeviceStatus';
 import Admin from './pages/Admin';
 
@@ -70,8 +69,6 @@ export default function App() {
         return <Analytics statusLogs={statusLogs} />;
       case 'history':
         return <History statusLogs={statusLogs} />;
-      case 'camera':
-        return <Camera detections={detections} statusLogs={statusLogs} />;
       case 'status':
         return <DeviceStatus devices={devices} statusLogs={statusLogs} />;
       case 'admin':
