@@ -12,7 +12,7 @@
 #define WIFI_PASSWORD "Admin@123"
 
 // API Endpoints
-#define API_BASE_URL "http://192.168.1.114:8000/api/v1"
+#define API_BASE_URL "http://172.20.10.2:8000/api/v1"
 #define DEVICE_API_KEY "esp32-super-secret-api-key-2026"
 
 // Water Level Thresholds (in cm)
