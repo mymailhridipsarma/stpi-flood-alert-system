@@ -1,0 +1,307 @@
+/* Professional Premium Design System */
+:root {
+  --font-primary: 'Inter', 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-secondary: 'Plus Jakarta Sans', 'Inter', sans-serif;
+
+  /* Sophisticated Slate/Zinc Dark Mode */
+  --bg-primary: 224 71% 4%;       /* Ultra dark slate */
+  --bg-secondary: 222 47% 11%;    /* Deep slate background */
+  --bg-card: 222 47% 11%;         /* Card background */
+  --bg-card-hover: 222 47% 15%;   
+  
+  --text-primary: 0 0% 100%;      /* Pure white */
+  --text-secondary: 215 20% 70%;  /* Muted slate text */
+  --text-muted: 215 15% 50%;
+
+  /* Professional Accents */
+  --primary: 217 91% 60%;         /* Tailwind Blue 500 */
+  --primary-glow: rgba(59, 130, 246, 0.15);
+  
+  --safe: 142 71% 45%;            /* Tailwind Emerald 500 */
+  --safe-glow: rgba(16, 185, 129, 0.15);
+  
+  --risky: 38 92% 50%;            /* Tailwind Amber 500 */
+  --risky-glow: rgba(245, 158, 11, 0.15);
+  
+  --danger: 348 83% 55%;          /* Tailwind Rose 500 */
+  --danger-glow: rgba(225, 29, 72, 0.15);
+  
+  --border: 215 28% 17%;
+  --border-focus: 217 91% 60%;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+  
+  --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-primary);
+  background-color: hsl(var(--bg-secondary));
+  color: hsl(var(--text-primary));
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Premium Glassmorphism Containers */
+.glass-panel {
+  background: rgba(17, 24, 39, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  transition: var(--transition-smooth);
+}
+
+.glass-panel:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(17, 24, 39, 0.75);
+}
+
+/* Typography */
+.gradient-text {
+  background: linear-gradient(to right, #ffffff, hsl(var(--text-secondary)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-safe-text {
+  color: hsl(var(--safe));
+}
+
+.gradient-risky-text {
+  color: hsl(var(--risky));
+}
+
+.gradient-danger-text {
+  color: hsl(var(--danger));
+}
+
+/* Layout Utilities */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 280px;
+  background-color: hsl(var(--bg-primary));
+  border-right: 1px solid hsl(var(--border));
+  display: flex;
+  flex-direction: column;
+  padding: 32px 24px;
+  position: fixed;
+  height: 100vh;
+  z-index: 100;
+}
+
+.main-content {
+  margin-left: 280px;
+  flex: 1;
+  padding: 40px;
+  background-color: hsl(var(--bg-secondary));
+  background-image: radial-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 24px 24px;
+  min-height: 100vh;
+}
+
+/* Sidebar Navigation Items */
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 40px;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav-item a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  color: hsl(var(--text-secondary));
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: var(--transition-smooth);
+}
+
+.nav-item a:hover {
+  color: hsl(var(--text-primary));
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.nav-item.active a {
+  background: rgba(59, 130, 246, 0.1);
+  color: hsl(var(--primary));
+  font-weight: 600;
+}
+
+/* Dashboard Cards Grid */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.metric-card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: hsl(var(--text-secondary));
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  font-family: var(--font-secondary);
+}
+
+.metric-value {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.metric-status {
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Status Indicator Badge */
+.badge {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.badge-safe {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: hsl(var(--safe));
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.badge-risky {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: hsl(var(--risky));
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.badge-danger {
+  background-color: rgba(225, 29, 72, 0.1);
+  color: hsl(var(--danger));
+  border: 1px solid rgba(225, 29, 72, 0.3);
+  animation: pulse-danger-soft 2s infinite;
+}
+
+/* Tables styling */
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+.history-table th {
+  text-align: left;
+  padding: 16px;
+  color: hsl(var(--text-secondary));
+  font-family: var(--font-secondary);
+  font-weight: 600;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.history-table td {
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.history-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Animations */
+@keyframes pulse-danger-soft {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* Leaflet Customization for dark mode maps */
+.leaflet-container {
+  border-radius: 16px;
+  border: 1px solid hsl(var(--border));
+  box-shadow: var(--shadow-lg);
+}
+
+/* Chart customization tooltips */
+.recharts-default-tooltip {
+  background-color: hsl(var(--bg-primary)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: 8px !important;
+}
+
+/* Responsive constraints */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 80px;
+    padding: 16px 8px;
+  }
+  .sidebar span {
+    display: none;
+  }
+  .main-content {
+    margin-left: 80px;
+  }
+}
+
+@media (max-width: 640px) {
+  .main-content {
+    padding: 16px;
+  }
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Dynamic App Container Status Classes */
+.status-danger .main-content {
+  background-color: hsl(var(--bg-secondary));
+  background-image: radial-gradient(rgba(225, 29, 72, 0.15) 1px, transparent 1px);
+}
+.status-risky .main-content {
+  background-color: hsl(var(--bg-secondary));
+  background-image: radial-gradient(rgba(245, 158, 11, 0.1) 1px, transparent 1px);
+}
+.status-safe .main-content {
+  background-color: hsl(var(--bg-secondary));
+  background-image: radial-gradient(rgba(16, 185, 129, 0.05) 1px, transparent 1px);
+}
