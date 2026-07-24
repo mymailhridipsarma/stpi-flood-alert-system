@@ -2,12 +2,24 @@ from fastapi import APIRouter, HTTPException, Depends, Header, status, UploadFil
 from app.models.telemetry import StatusLogCreate, ObjectDetectionCreate, AlertCreate, AlertResponse
 from app.database import supabase_client
 from app.routers.device import verify_device_key
+from app.services.telegram import send_telegram_notification
+from app.config import settings
 from typing import List, Optional, Dict, Any
+from pydantic import BaseModel
 import base64
 import json
 from datetime import datetime
 
 router = APIRouter(tags=["telemetry"])
+
+# Pydantic models for Telegram config/test
+class TelegramTestRequest(BaseModel):
+    bot_token: Optional[str] = None
+    chat_id: Optional[str] = None
+
+class TelegramConfigRequest(BaseModel):
+    bot_token: str
+    chat_id: str
 
 # Helpers to trigger alerts
 def send_push_notification(device_id: str, title: str, body: str):
@@ -62,9 +74,10 @@ async def evaluate_emergency_rules(device_id: str, current_water_level: float, c
                     "message": alert_msg
                 }).execute()
                 
-                # Trigger Push and SMS
+                # Trigger Push, SMS, and Telegram
                 send_push_notification(device_id, "EMERGENCY FLOOD OBSTACLE", alert_msg)
                 send_sms_notification(device_id, alert_msg)
+                send_telegram_notification(f"<b>⚠️ EMERGENCY FLOOD OBSTACLE</b>\n\n{alert_msg}")
                 break
     except Exception as e:
         print(f"Error evaluating emergency rules: {str(e)}")
@@ -114,6 +127,13 @@ async def post_status(log: StatusLogCreate, _=Depends(verify_device_key)):
                 }).execute()
                 send_push_notification(log.device_id, "CRITICAL WATER LEVEL", alert_msg)
                 send_sms_notification(log.device_id, alert_msg)
+                send_telegram_notification(
+                    f"<b>🚨 CRITICAL WATER LEVEL ALERT</b>\n\n"
+                    f"<b>Device:</b> {log.device_id}\n"
+                    f"<b>Water Level:</b> {log.water_level_cm} cm\n"
+                    f"<b>Status:</b> CRITICAL DANGER\n"
+                    f"<b>Timestamp:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                )
 
         elif log.status.upper() == "SAFE" or log.status.upper() == "RISKY":
             # Resolve existing danger alerts automatically
@@ -292,4 +312,51 @@ async def get_recent_objects(device_id: Optional[str] = None, limit: Optional[in
         return res.data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/telegram/test")
+async def test_telegram_alert(req: TelegramTestRequest):
+    """
+    Send a test Telegram message using configured or provided Bot credentials.
+    """
+    msg = (
+        "<b>🤖 Smart Flood System - Telegram Bot Test</b>\n\n"
+        "If you are reading this message, your Telegram Bot integration is <b>SUCCESSFULLY CONNECTED!</b> 🎉\n\n"
+        "You will receive automatic alerts here when critical flood levels or obstacles are detected."
+    )
+    success = send_telegram_notification(msg, bot_token=req.bot_token, chat_id=req.chat_id)
+    if success:
+        return {"status": "success", "message": "Test notification sent successfully to Telegram!"}
+    else:
+        raise HTTPException(
+            status_code=400, 
+            detail="Failed to send Telegram message. Please verify your Bot Token and Chat ID."
+        )
+
+
+@router.post("/telegram/config")
+async def save_telegram_config(req: TelegramConfigRequest):
+    """
+    Update runtime Telegram Bot Token and Chat ID settings.
+    """
+    settings.TELEGRAM_BOT_TOKEN = req.bot_token.strip()
+    settings.TELEGRAM_CHAT_ID = req.chat_id.strip()
+    return {
+        "status": "success", 
+        "message": "Telegram Bot settings updated successfully!",
+        "bot_token_set": bool(settings.TELEGRAM_BOT_TOKEN),
+        "chat_id_set": bool(settings.TELEGRAM_CHAT_ID)
+    }
+
+
+@router.get("/telegram/config")
+async def get_telegram_config():
+    """
+    Retrieve current Telegram Bot configuration status.
+    """
+    return {
+        "bot_token": settings.TELEGRAM_BOT_TOKEN,
+        "chat_id": settings.TELEGRAM_CHAT_ID,
+        "configured": bool(settings.TELEGRAM_BOT_TOKEN and settings.TELEGRAM_CHAT_ID)
+    }
 

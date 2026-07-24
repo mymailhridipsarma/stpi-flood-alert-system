@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     # Device Authentication Key (simple shared secret for ESP32 request verification)
     DEVICE_API_KEY: str = os.getenv("DEVICE_API_KEY", "esp32-super-secret-api-key-2026")
 
+    # Telegram Bot Configuration
+    TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "")
+    TELEGRAM_CHAT_ID: str = os.getenv("TELEGRAM_CHAT_ID", "")
+
     class Config:
         case_sensitive = True
 
