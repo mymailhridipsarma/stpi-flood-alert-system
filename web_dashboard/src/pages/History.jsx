@@ -3,10 +3,36 @@ import { Download, Search, Filter, Calendar } from 'lucide-react';
 
 export default function History({ statusLogs }) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [statusFilter, setStatusFilter] = useState('DANGER');
+
+  // Sort logs oldest to newest to correctly calculate time intervals
+  const sortedLogs = [...statusLogs].sort((a, b) => new Date(a.recorded_at) - new Date(b.recorded_at));
+
+  let lastDangerTime = null;
+  const THREE_MINUTES_MS = 3 * 60 * 1000;
+
+  // Filter logs to show only one DANGER log per 3 minutes
+  const throttledLogs = sortedLogs.filter(log => {
+    if (log.status.toUpperCase() === 'SAFE') {
+      lastDangerTime = null; // Reset the timer when it's safe
+    }
+
+    if (log.status.toUpperCase() === 'DANGER') {
+      const logTime = new Date(log.recorded_at).getTime();
+      if (!lastDangerTime || (logTime - lastDangerTime) >= THREE_MINUTES_MS) {
+        lastDangerTime = logTime;
+        return true;
+      }
+      return false; // Skip this danger log
+    }
+    return true; // Keep other logs normally
+  });
+
+  // Re-sort back to newest first for display
+  throttledLogs.sort((a, b) => new Date(b.recorded_at) - new Date(a.recorded_at));
 
   // Filter logs based on search and status dropdown
-  const filteredLogs = statusLogs.filter(log => {
+  const filteredLogs = throttledLogs.filter(log => {
     const matchesSearch = log.device_id.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'ALL' || log.status.toUpperCase() === statusFilter;
     return matchesSearch && matchesStatus;

@@ -23,29 +23,35 @@ export default function App() {
       const devRes = await fetch(`${API_BASE_URL}/device/list`);
       if (devRes.ok) {
         const devData = await devRes.json();
-        if (devData.length > 0) setDevices(devData);
+        if (devData.length > 0) {
+          setDevices(prev => JSON.stringify(prev) !== JSON.stringify(devData) ? devData : prev);
+        }
       }
 
       // Fetch history
       const activeDevId = devices[0]?.device_id || 'DEV-ESP32-MAIN-001';
-      const histRes = await fetch(`${API_BASE_URL}/history?device_id=${activeDevId}`);
+      const histRes = await fetch(`${API_BASE_URL}/history?device_id=${activeDevId}&limit=20`);
       if (histRes.ok) {
         const histData = await histRes.json();
-        if (histData.length > 0) setStatusLogs(histData);
+        if (histData.length > 0) {
+          setStatusLogs(prev => prev.length === 0 || prev[0].id !== histData[0].id ? histData : prev);
+        }
       }
 
       // Fetch alerts
       const alertRes = await fetch(`${API_BASE_URL}/alerts`);
       if (alertRes.ok) {
         const alertData = await alertRes.json();
-        setAlerts(alertData);
+        setAlerts(prev => prev.length !== alertData.length || (alertData.length > 0 && prev[0]?.id !== alertData[0].id) ? alertData : prev);
       }
 
       // Fetch detections
       const detRes = await fetch(`${API_BASE_URL}/object/recent`);
       if (detRes.ok) {
         const detData = await detRes.json();
-        if (detData.length > 0) setDetections(detData);
+        if (detData.length > 0) {
+          setDetections(prev => prev.length === 0 || prev[0].id !== detData[0].id ? detData : prev);
+        }
       }
     } catch (error) {
       console.warn('FastAPI backend offline. Operating in simulation mode with local states.');

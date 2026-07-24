@@ -11,11 +11,9 @@ import {
 
 export default function HistoryChart({ data }) {
   // Format dates for display
-  const MAX_SENSOR_HEIGHT = 40; // Assume sensor is mounted 40cm above ground
   const chartData = data.map(item => ({
-    time: new Date(item.recorded_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-    'Distance (cm)': item.water_level_cm,
-    'Water Height (cm)': Math.max(0, MAX_SENSOR_HEIGHT - item.water_level_cm),
+    time: item.recorded_at ? new Date(item.recorded_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '',
+    'Water Level (cm)': item.water_level_cm,
   })).reverse(); // Reverse to read chronologically (left to right)
 
   return (
@@ -42,7 +40,7 @@ export default function HistoryChart({ data }) {
             stroke="hsl(var(--text-secondary))" 
             fontSize={12} 
             tickLine={false}
-            domain={[-10, 40]}
+            domain={[-10, 'auto']}
           />
           <Tooltip 
             contentStyle={{ 
@@ -54,7 +52,7 @@ export default function HistoryChart({ data }) {
           />
           <Area 
             type="natural" 
-            dataKey="Water Height (cm)" 
+            dataKey="Water Level (cm)" 
             stroke="hsl(var(--primary))" 
             strokeWidth={2}
             fillOpacity={1} 

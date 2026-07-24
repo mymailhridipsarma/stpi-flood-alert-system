@@ -79,12 +79,10 @@ void loop() {
         
         float dist = sensor.readDistanceCm();
         if (dist >= 0) {
-            // Level is inverse of distance to bottom (let's assume sensor is at height 50cm)
-            // Or directly display the measured height for simplicity as requested:
-            // "Measure water level every second. 0-15cm SAFE, 16-30cm RISKY, Above 30cm DANGER"
-            // Note: usually, water logging depth is: installation_height - distance_measured.
-            // But we will use the user's direct values for logic:
-            waterLevelCm = dist; 
+            // Assuming the sensor is installed at a height of 50cm
+            float sensorHeight = 50.0;
+            waterLevelCm = sensorHeight - dist;
+            if (waterLevelCm < 0) waterLevelCm = 0.0; // clamp to 0
             currentStatus = evaluateStatus(waterLevelCm);
         } else {
             currentStatus = STATUS_UNKNOWN;
@@ -145,12 +143,12 @@ void loop() {
 
 AlertStatus evaluateStatus(float waterCm) {
     if (waterCm < 0) return STATUS_UNKNOWN;
-    // Low distance means water is very close to sensor = DANGER
-    if (waterCm <= WATER_SAFE_MAX_CM) return STATUS_DANGER;
-    // Medium distance = RISKY
+    // Low water level = SAFE
+    if (waterCm <= WATER_SAFE_MAX_CM) return STATUS_SAFE;
+    // Medium water level = RISKY
     if (waterCm <= WATER_RISKY_MAX_CM) return STATUS_RISKY;
-    // High distance means water is far away = SAFE
-    return STATUS_SAFE;
+    // High water level = DANGER
+    return STATUS_DANGER;
 }
 
 void processSerialCamInput() {
