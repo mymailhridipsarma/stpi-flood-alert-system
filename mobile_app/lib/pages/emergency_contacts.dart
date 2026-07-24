@@ -10,8 +10,8 @@ class EmergencyContactsPage extends StatefulWidget {
 class _EmergencyContactsPageState extends State<EmergencyContactsPage> {
   final List<Map<String, String>> _contacts = [
     {'name': 'National Disaster Response (NDRF)', 'phone': '1078', 'type': 'Disaster Control'},
-    {'name': 'Highway Patrol Division', 'phone': '+1-555-0120', 'type': 'Police Dispatch'},
-    {'name': 'Municipal Drainage Control', 'phone': '+1-555-0188', 'type': 'Primary Service'}
+    {'name': 'Highway Patrol Division', 'phone': '+91 98642 80012', 'type': 'Police Dispatch'},
+    {'name': 'Municipal Drainage Control', 'phone': '+91 98765 01880', 'type': 'Primary Service'}
   ];
 
   final _nameController = TextEditingController();

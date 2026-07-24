@@ -5,8 +5,8 @@ export default function Admin() {
   const [safeThreshold, setSafeThreshold] = useState(15);
   const [riskyThreshold, setRiskyThreshold] = useState(30);
   const [contacts, setContacts] = useState([
-    { name: 'City Disaster Response', phone: '+1-555-0199', type: 'Primary' },
-    { name: 'Municipal Highway Patrol', phone: '+1-555-0120', type: 'Secondary' }
+    { name: 'City Disaster Response', phone: '+91 98765 01990', type: 'Primary' },
+    { name: 'Municipal Highway Patrol', phone: '+91 98765 01200', type: 'Secondary' }
   ]);
   const [newContact, setNewContact] = useState({ name: '', phone: '', type: 'Primary' });
   const [alertConfig, setAlertConfig] = useState({
@@ -170,7 +170,7 @@ export default function Admin() {
             />
             <input 
               type="text" 
-              placeholder="Phone"
+              placeholder="Phone (+91...)"
               value={newContact.phone}
               onChange={(e) => setNewContact({ ...newContact, phone: e.target.value })}
               style={{
