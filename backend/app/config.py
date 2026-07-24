@@ -18,8 +18,8 @@ class Settings(BaseSettings):
     DEVICE_API_KEY: str = os.getenv("DEVICE_API_KEY", "esp32-super-secret-api-key-2026")
 
     # Telegram Bot Configuration
-    TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "")
-    TELEGRAM_CHAT_ID: str = os.getenv("TELEGRAM_CHAT_ID", "")
+    TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "8826309434:AAE_FOaeYVT5B9z7kxjM_09Xk89ITyM3ceI")
+    TELEGRAM_CHAT_ID: str = os.getenv("TELEGRAM_CHAT_ID", "1618261785")
 
     class Config:
         case_sensitive = True

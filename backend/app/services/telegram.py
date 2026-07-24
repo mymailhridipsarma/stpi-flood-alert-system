@@ -1,11 +1,13 @@
 import urllib.request
 import urllib.parse
 import json
+import ssl
 from app.config import settings
 
 def send_telegram_notification(message: str, bot_token: str = None, chat_id: str = None) -> bool:
     """
     Sends a formatted alert message via Telegram Bot API using urllib.
+    Handles SSL contexts cleanly for macOS environments.
     """
     token = bot_token or settings.TELEGRAM_BOT_TOKEN
     cid = chat_id or settings.TELEGRAM_CHAT_ID
@@ -25,10 +27,18 @@ def send_telegram_notification(message: str, bot_token: str = None, chat_id: str
         req = urllib.request.Request(
             url, 
             data=payload, 
-            headers={'Content-Type': 'application/json'}
+            headers={
+                'Content-Type': 'application/json',
+                'User-Agent': 'Mozilla/5.0'
+            }
         )
         
-        with urllib.request.urlopen(req, timeout=8) as response:
+        # Create SSL context to prevent CERTIFICATE_VERIFY_FAILED error on macOS
+        ssl_ctx = ssl.create_default_context()
+        ssl_ctx.check_hostname = False
+        ssl_ctx.verify_mode = ssl.CERT_NONE
+
+        with urllib.request.urlopen(req, timeout=8, context=ssl_ctx) as response:
             res = json.loads(response.read().decode('utf-8'))
             success = res.get('ok', False)
             print(f"[TELEGRAM ALERT] Status: {success}")
