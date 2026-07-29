@@ -50,7 +50,22 @@ CREATE INDEX idx_status_logs_device_recorded ON status_logs(device_id, recorded_
 CREATE INDEX idx_object_detections_device_detected ON object_detections(device_id, detected_at DESC);
 CREATE INDEX idx_alerts_device_created ON alerts(device_id, created_at DESC);
 
--- Initial Mock Device Insert for testing
+-- Automatic Auto-Cleanup Function (Deletes status logs older than 10 seconds)
+CREATE OR REPLACE FUNCTION cleanup_old_status_logs()
+RETURNS trigger AS $$
+BEGIN
+    DELETE FROM status_logs WHERE recorded_at < NOW() - INTERVAL '10 seconds';
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger to run cleanup automatically on every new telemetry upload
+DROP TRIGGER IF EXISTS trigger_cleanup_status_logs ON status_logs;
+CREATE TRIGGER trigger_cleanup_status_logs
+    AFTER INSERT ON status_logs
+    EXECUTE FUNCTION cleanup_old_status_logs();
+
+-- Initial Device Insert for testing
 INSERT INTO devices (device_id, name, status, last_latitude, last_longitude)
 VALUES ('DEV-ESP32-MAIN-001', 'Highway 101 Flood Node', 'ONLINE', 37.7749, -122.4194)
 ON CONFLICT (device_id) DO NOTHING;
