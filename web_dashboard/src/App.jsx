@@ -6,6 +6,7 @@ import Analytics from './pages/Analytics';
 import History from './pages/History';
 import DeviceStatus from './pages/DeviceStatus';
 import Admin from './pages/Admin';
+import { supabase, isSupabaseConfigured } from './supabaseClient';
 
 const DEFAULT_BACKEND_IP = '192.168.1.114';
 const currentHost = window.location.hostname;
@@ -19,9 +20,28 @@ export default function App() {
   const [alerts, setAlerts] = useState([]);
   const [detections, setDetections] = useState([]);
 
-  // Fetch telemetry and alerts data from API
+  // Fetch telemetry and alerts data from API or Supabase
   const fetchData = async () => {
     try {
+      if (isSupabaseConfigured) {
+        const { data: logsData } = await supabase
+          .from('status_logs')
+          .select('*')
+          .order('recorded_at', { ascending: false })
+          .limit(20);
+
+        if (logsData && logsData.length > 0) {
+          setStatusLogs(prev => prev.length === 0 || prev[0].id !== logsData[0].id ? logsData : prev);
+        }
+
+        const { data: devData } = await supabase.from('devices').select('*');
+        if (devData && devData.length > 0) setDevices(devData);
+
+        const { data: alertData } = await supabase.from('alerts').select('*').order('created_at', { ascending: false });
+        if (alertData) setAlerts(alertData);
+        return;
+      }
+
       // Fetch devices
       const devRes = await fetch(`${API_BASE_URL}/device/list`);
       if (devRes.ok) {
@@ -57,7 +77,7 @@ export default function App() {
         }
       }
     } catch (error) {
-      console.warn('FastAPI backend offline. Operating in simulation mode with local states.');
+      console.warn('Backend API offline. Operating in simulation mode with local states.');
     }
   };
 
