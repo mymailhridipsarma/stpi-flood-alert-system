@@ -19,15 +19,36 @@ export default function App() {
   const [alerts, setAlerts] = useState([]);
   const [detections, setDetections] = useState([]);
 
-  // Fetch telemetry and alerts data from API
+  // Fetch telemetry and alerts data from API or Supabase
   const fetchData = async () => {
     try {
+      if (isSupabaseConfigured) {
+        const { data: logsData } = await supabase
+          .from('status_logs')
+          .select('*')
+          .order('recorded_at', { ascending: false })
+          .limit(20);
+
+        if (logsData && logsData.length > 0) {
+          setStatusLogs(logsData);
+        }
+
+        const { data: devData } = await supabase.from('devices').select('*');
+        if (devData && devData.length > 0) {
+          setDevices(devData);
+        }
+
+        const { data: alertData } = await supabase.from('alerts').select('*').order('created_at', { ascending: false });
+        if (alertData) setAlerts(alertData);
+        return;
+      }
+
       // Fetch devices
       const devRes = await fetch(`${API_BASE_URL}/device/list`);
       if (devRes.ok) {
         const devData = await devRes.json();
         if (devData.length > 0) {
-          setDevices(prev => JSON.stringify(prev) !== JSON.stringify(devData) ? devData : prev);
+          setDevices(devData);
         }
       }
 
