@@ -24,14 +24,16 @@ export default function App() {
   const fetchData = async () => {
     try {
       if (isSupabaseConfigured) {
-        const { data: logsData } = await supabase
+        const { data: logsData, error: logsErr } = await supabase
           .from('status_logs')
           .select('*')
           .order('recorded_at', { ascending: false })
           .limit(20);
 
-        if (logsData && logsData.length > 0) {
-          setStatusLogs(prev => prev.length === 0 || prev[0].id !== logsData[0].id ? logsData : prev);
+        if (logsErr) {
+          console.error("Supabase logs error:", logsErr);
+        } else if (logsData && logsData.length > 0) {
+          setStatusLogs(logsData);
         }
 
         const { data: devData } = await supabase.from('devices').select('*');
@@ -47,7 +49,7 @@ export default function App() {
       if (devRes.ok) {
         const devData = await devRes.json();
         if (devData.length > 0) {
-          setDevices(prev => JSON.stringify(prev) !== JSON.stringify(devData) ? devData : prev);
+          setDevices(devData);
         }
       }
 
@@ -57,7 +59,7 @@ export default function App() {
       if (histRes.ok) {
         const histData = await histRes.json();
         if (histData.length > 0) {
-          setStatusLogs(prev => prev.length === 0 || prev[0].id !== histData[0].id ? histData : prev);
+          setStatusLogs(histData);
         }
       }
 
@@ -65,7 +67,7 @@ export default function App() {
       const alertRes = await fetch(`${API_BASE_URL}/alerts`);
       if (alertRes.ok) {
         const alertData = await alertRes.json();
-        setAlerts(prev => prev.length !== alertData.length || (alertData.length > 0 && prev[0]?.id !== alertData[0].id) ? alertData : prev);
+        setAlerts(alertData);
       }
 
       // Fetch detections
@@ -73,7 +75,7 @@ export default function App() {
       if (detRes.ok) {
         const detData = await detRes.json();
         if (detData.length > 0) {
-          setDetections(prev => prev.length === 0 || prev[0].id !== detData[0].id ? detData : prev);
+          setDetections(detData);
         }
       }
     } catch (error) {
@@ -85,7 +87,7 @@ export default function App() {
     fetchData();
     const interval = setInterval(fetchData, 1000);
     return () => clearInterval(interval);
-  }, [devices[0]?.device_id]);
+  }, []);
 
   // Render Page Content based on tab ID
   const renderContent = () => {
