@@ -50,12 +50,6 @@ CREATE INDEX idx_status_logs_device_recorded ON status_logs(device_id, recorded_
 CREATE INDEX idx_object_detections_device_detected ON object_detections(device_id, detected_at DESC);
 CREATE INDEX idx_alerts_device_created ON alerts(device_id, created_at DESC);
 
--- Disable Row Level Security (RLS) to allow public API telemetry uploads & reads
-ALTER TABLE devices DISABLE ROW LEVEL SECURITY;
-ALTER TABLE status_logs DISABLE ROW LEVEL SECURITY;
-ALTER TABLE object_detections DISABLE ROW LEVEL SECURITY;
-ALTER TABLE alerts DISABLE ROW LEVEL SECURITY;
-
 -- Initial Mock Device Insert for testing
 INSERT INTO devices (device_id, name, status, last_latitude, last_longitude)
 VALUES ('DEV-ESP32-MAIN-001', 'Highway 101 Flood Node', 'ONLINE', 37.7749, -122.4194)

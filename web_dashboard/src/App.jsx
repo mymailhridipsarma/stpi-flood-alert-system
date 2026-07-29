@@ -6,7 +6,6 @@ import Analytics from './pages/Analytics';
 import History from './pages/History';
 import DeviceStatus from './pages/DeviceStatus';
 import Admin from './pages/Admin';
-import { supabase, isSupabaseConfigured } from './supabaseClient';
 
 const DEFAULT_BACKEND_IP = '192.168.1.114';
 const currentHost = window.location.hostname;
@@ -20,36 +19,15 @@ export default function App() {
   const [alerts, setAlerts] = useState([]);
   const [detections, setDetections] = useState([]);
 
-  // Fetch telemetry and alerts data from API or Supabase
+  // Fetch telemetry and alerts data from API
   const fetchData = async () => {
     try {
-      if (isSupabaseConfigured) {
-        const { data: logsData, error: logsErr } = await supabase
-          .from('status_logs')
-          .select('*')
-          .order('recorded_at', { ascending: false })
-          .limit(20);
-
-        if (logsErr) {
-          console.error("Supabase logs error:", logsErr);
-        } else if (logsData && logsData.length > 0) {
-          setStatusLogs(logsData);
-        }
-
-        const { data: devData } = await supabase.from('devices').select('*');
-        if (devData && devData.length > 0) setDevices(devData);
-
-        const { data: alertData } = await supabase.from('alerts').select('*').order('created_at', { ascending: false });
-        if (alertData) setAlerts(alertData);
-        return;
-      }
-
       // Fetch devices
       const devRes = await fetch(`${API_BASE_URL}/device/list`);
       if (devRes.ok) {
         const devData = await devRes.json();
         if (devData.length > 0) {
-          setDevices(devData);
+          setDevices(prev => JSON.stringify(prev) !== JSON.stringify(devData) ? devData : prev);
         }
       }
 
@@ -59,7 +37,7 @@ export default function App() {
       if (histRes.ok) {
         const histData = await histRes.json();
         if (histData.length > 0) {
-          setStatusLogs(histData);
+          setStatusLogs(prev => prev.length === 0 || prev[0].id !== histData[0].id ? histData : prev);
         }
       }
 
@@ -67,7 +45,7 @@ export default function App() {
       const alertRes = await fetch(`${API_BASE_URL}/alerts`);
       if (alertRes.ok) {
         const alertData = await alertRes.json();
-        setAlerts(alertData);
+        setAlerts(prev => prev.length !== alertData.length || (alertData.length > 0 && prev[0]?.id !== alertData[0].id) ? alertData : prev);
       }
 
       // Fetch detections
@@ -75,11 +53,11 @@ export default function App() {
       if (detRes.ok) {
         const detData = await detRes.json();
         if (detData.length > 0) {
-          setDetections(detData);
+          setDetections(prev => prev.length === 0 || prev[0].id !== detData[0].id ? detData : prev);
         }
       }
     } catch (error) {
-      console.warn('Backend API offline. Operating in simulation mode with local states.');
+      console.warn('FastAPI backend offline. Operating in simulation mode with local states.');
     }
   };
 
@@ -87,7 +65,7 @@ export default function App() {
     fetchData();
     const interval = setInterval(fetchData, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [devices[0]?.device_id]);
 
   // Render Page Content based on tab ID
   const renderContent = () => {

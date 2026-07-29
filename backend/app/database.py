@@ -99,15 +99,4 @@ class MockSupabase:
     def table(self, name):
         return MockQuery(name, self.db)
 
-from supabase import create_client, Client
-from app.config import settings
-
-if settings.SUPABASE_URL and "supabase.co" in settings.SUPABASE_URL and settings.SUPABASE_KEY:
-    try:
-        supabase_client: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
-        print(f"[SUPABASE] Successfully initialized connection to real Supabase Cloud: {settings.SUPABASE_URL}")
-    except Exception as e:
-        print(f"[SUPABASE ERROR] Falling back to MockSupabase: {str(e)}")
-        supabase_client = MockSupabase()
-else:
-    supabase_client = MockSupabase()
+supabase_client = MockSupabase()

@@ -1,7 +1,5 @@
 #include "api.h"
-#include "config.h"
 #include <WiFi.h>
-#include <WiFiClientSecure.h>
 #include <esp_task_wdt.h>
 
 ApiClient::ApiClient(String url, String key) {
@@ -28,18 +26,13 @@ bool ApiClient::sendTelemetry(TelemetryReport report) {
         return false;
     }
 
-    WiFiClientSecure client;
-    client.setInsecure(); // Skip SSL certificate check for HTTPS
-
     HTTPClient http;
-    String url = String(SUPABASE_REST_URL) + "/status_logs";
-    http.begin(client, url);
+    String url = baseUrl + "/status";
+    http.begin(url);
     
-    // Set headers for Supabase REST API
+    // Set headers
     http.addHeader("Content-Type", "application/json");
-    http.addHeader("apikey", SUPABASE_ANON_KEY);
-    http.addHeader("Authorization", String("Bearer ") + String(SUPABASE_ANON_KEY));
-    http.addHeader("Prefer", "return=minimal");
+    http.addHeader("x-device-key", apiKey);
 
     // Create JSON Payload
     JsonDocument doc;
@@ -52,14 +45,14 @@ bool ApiClient::sendTelemetry(TelemetryReport report) {
     String jsonString;
     serializeJson(doc, jsonString);
 
-    Serial.print("[API] Pushing telemetry directly to Supabase Cloud: ");
+    Serial.print("[API] Pushing telemetry to: ");
     Serial.println(url);
 
     int httpResponseCode = http.POST(jsonString);
     bool success = false;
 
     if (httpResponseCode > 0) {
-        Serial.print("[API] Supabase Response Code: ");
+        Serial.print("[API] Response Code: ");
         Serial.println(httpResponseCode);
         if (httpResponseCode >= 200 && httpResponseCode < 300) {
             success = true;
@@ -70,23 +63,6 @@ bool ApiClient::sendTelemetry(TelemetryReport report) {
     }
 
     http.end();
-
-    // Also update devices table status in Supabase
-    if (success) {
-        HTTPClient httpDev;
-        String devUrl = String(SUPABASE_REST_URL) + "/devices?device_id=eq." + report.deviceId;
-        httpDev.begin(client, devUrl);
-        httpDev.addHeader("Content-Type", "application/json");
-        httpDev.addHeader("apikey", SUPABASE_ANON_KEY);
-        httpDev.addHeader("Authorization", String("Bearer ") + String(SUPABASE_ANON_KEY));
-        
-        JsonDocument devDoc;
-        devDoc["status"] = report.status;
-        String devJson;
-        serializeJson(devDoc, devJson);
-        httpDev.PATCH(devJson);
-        httpDev.end();
-    }
 
     if (!success) {
         // Cache if server was unreachable or error occurred

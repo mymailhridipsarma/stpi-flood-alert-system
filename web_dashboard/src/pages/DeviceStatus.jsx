@@ -55,9 +55,9 @@ export default function DeviceStatus({ devices, statusLogs }) {
               <span style={{ color: 'hsl(var(--text-secondary))' }}>Status</span>
               <span style={{ 
                 fontWeight: 600, 
-                color: (device.status && device.status !== 'OFFLINE' && device.status !== 'UNKNOWN') ? '#10b981' : '#ef4444' 
+                color: device.status === 'ONLINE' ? '#10b981' : '#ef4444' 
               }}>
-                {(device.status && device.status !== 'OFFLINE' && device.status !== 'UNKNOWN') ? `ONLINE (${device.status})` : (device.status || 'OFFLINE')}
+                {device.status}
               </span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '12px' }}>
