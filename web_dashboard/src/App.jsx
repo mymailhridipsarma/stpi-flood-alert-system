@@ -7,7 +7,10 @@ import History from './pages/History';
 import DeviceStatus from './pages/DeviceStatus';
 import Admin from './pages/Admin';
 
-const API_BASE_URL = `http://${window.location.hostname}:8000/api/v1`;
+const DEFAULT_BACKEND_IP = '192.168.1.114';
+const currentHost = window.location.hostname;
+const backendHost = (currentHost === 'localhost' || currentHost === '127.0.0.1' || currentHost === '') ? currentHost : DEFAULT_BACKEND_IP;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || `http://${backendHost}:8000/api/v1`;
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
