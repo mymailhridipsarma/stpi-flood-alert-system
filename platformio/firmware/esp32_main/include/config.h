@@ -11,9 +11,11 @@
 #define WIFI_SSID "STPI"
 #define WIFI_PASSWORD "Admin@123"
 
-// API Endpoints
+// API Endpoints & Supabase Direct Cloud Uploads
 #define API_BASE_URL "http://192.168.1.114:8000/api/v1"
 #define DEVICE_API_KEY "esp32-super-secret-api-key-2026"
+#define SUPABASE_REST_URL "https://xhnmjokqxwfhxkrjuidh.supabase.co/rest/v1"
+#define SUPABASE_ANON_KEY "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhobm1qb2txeHdmaHhrcmp1aWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzMDM4MzgsImV4cCI6MjEwMDg3OTgzOH0.6aN0Hm32Tzqzejm4olpcwv-SOvm5EEBW7APlJR9MZ2Y"
 
 // Water Level Thresholds (in cm)
 #define WATER_SAFE_MAX_CM 15.0
