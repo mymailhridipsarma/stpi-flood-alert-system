@@ -56,7 +56,7 @@ export default function App() {
           setDevices([
             {
               device_id: latest.device_id || 'DEV-ESP32-MAIN-001',
-              name: 'Highway 101 Flood Node',
+              name: 'AquaPulse Flood Node',
               status: latest.status || 'SAFE',
               last_seen: latest.recorded_at,
               last_latitude: 37.7749,

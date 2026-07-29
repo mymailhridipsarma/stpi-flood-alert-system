@@ -5,7 +5,7 @@
 
 // Device ID
 #define DEVICE_ID "DEV-ESP32-MAIN-001"
-#define DEVICE_NAME "Highway 101 Flood Node"
+#define DEVICE_NAME "AquaPulse Flood Node"
 
 // WiFi Credentials
 #define WIFI_SSID "STPI"

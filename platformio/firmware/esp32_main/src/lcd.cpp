@@ -15,7 +15,7 @@ LcdController::LcdController(uint8_t address)
 void LcdController::begin() {
     lcd.init();
     lcd.backlight();
-    showMessage("Smart Flood Sys", "Initializing...");
+    showMessage("AquaPulse Node", "Initializing...");
 }
 
 void LcdController::updateData(float waterCm, AlertStatus status, double lat, double lng, String object, int rssi) {
@@ -27,17 +27,14 @@ void LcdController::updateData(float waterCm, AlertStatus status, double lat, do
         lastObjectStr = object;
     }
     lastWifiRssi = rssi;
+    
+    // Immediately render updated water level & status
+    renderCurrentPage();
 }
 
 void LcdController::loop() {
-    unsigned long now = millis();
-    if (now - lastRotateTime >= 5000) {
-        lastRotateTime = now;
-        // Cycle page
-        currentPage = static_cast<LcdPage>((static_cast<int>(currentPage) + 1) % PAGE_MAX_COUNT);
-        lcd.clear();
-        renderCurrentPage();
-    }
+    // Keep LCD fixed to AquaPulse water level and status screen only (no rotation)
+    renderCurrentPage();
 }
 
 void LcdController::showMessage(const char* line1, const char* line2) {
@@ -52,44 +49,23 @@ void LcdController::renderCurrentPage() {
     char buf1[17];
     char buf2[17];
 
-    switch (currentPage) {
-        case PAGE_WATER_STATUS:
-            // Line 1: Water: XX.Xcm
-            if (lastWaterCm < 0) {
-                snprintf(buf1, sizeof(buf1), "Water: ERROR   ");
-            } else {
-                snprintf(buf1, sizeof(buf1), "Water: %.1fcm", lastWaterCm);
-            }
-            // Line 2: Status
-            if (lastStatus == STATUS_SAFE) {
-                snprintf(buf2, sizeof(buf2), "SAFE TO PASS    ");
-            } else if (lastStatus == STATUS_RISKY) {
-                snprintf(buf2, sizeof(buf2), "RISKY PASSAGE   ");
-            } else if (lastStatus == STATUS_DANGER) {
-                snprintf(buf2, sizeof(buf2), "DANGER! SHUTDOWN");
-            } else {
-                snprintf(buf2, sizeof(buf2), "CALIBRATING...  ");
-            }
-            break;
+    const char* statusStr = "SAFE  ";
+    if (lastStatus == STATUS_RISKY) {
+        statusStr = "RISKY ";
+    } else if (lastStatus == STATUS_DANGER) {
+        statusStr = "DANGER";
+    } else if (lastStatus == STATUS_UNKNOWN) {
+        statusStr = "WAIT..";
+    }
 
-        case PAGE_GPS:
-            // Line 1: Lat: XX.XXXX
-            snprintf(buf1, sizeof(buf1), "Lat: %.5f", lastLat);
-            // Line 2: Lng: XX.XXXX
-            snprintf(buf2, sizeof(buf2), "Lng: %.5f", lastLng);
-            break;
+    // Line 1: AquaPulse  <STATUS>
+    snprintf(buf1, sizeof(buf1), "AquaPulse %-6s", statusStr);
 
-        case PAGE_OBJECTS:
-            // Line 1: Object detected
-            snprintf(buf1, sizeof(buf1), "Objects Alert:  ");
-            // Line 2: Object Details
-            snprintf(buf2, sizeof(buf2), "%s", lastObjectStr.substring(0, 16).c_str());
-            break;
-
-
-
-        default:
-            return;
+    // Line 2: Water: XX.X cm
+    if (lastWaterCm < 0) {
+        snprintf(buf2, sizeof(buf2), "Water: ERROR   ");
+    } else {
+        snprintf(buf2, sizeof(buf2), "Water: %-5.1f cm", lastWaterCm);
     }
 
     lcd.setCursor(0, 0);

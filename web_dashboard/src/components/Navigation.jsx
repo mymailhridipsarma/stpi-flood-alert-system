@@ -23,7 +23,7 @@ export default function Navigation({ activeTab, setActiveTab }) {
     <aside className="sidebar">
       <div className="nav-logo">
         <Waves className="gradient-text" size={32} />
-        <span style={{ fontWeight: 800, letterSpacing: '0.5px' }}>SmartFlood</span>
+        <span style={{ fontWeight: 800, letterSpacing: '0.5px' }}>AquaPulse</span>
       </div>
       <ul className="nav-links">
         {navItems.map((item) => {
