@@ -84,7 +84,7 @@ bool ApiClient::sendTelemetry(TelemetryReport report) {
         devDoc["status"] = report.status;
         String devJson;
         serializeJson(devDoc, devJson);
-        httpDev.PATCH(devJson);
+        httpDev.sendRequest("PATCH", (uint8_t*)devJson.c_str(), devJson.length());
         httpDev.end();
     }
 

@@ -31,11 +31,18 @@ export default function App() {
 
         if (logsData && logsData.length > 0) {
           setStatusLogs(logsData);
-        }
 
-        const { data: devData } = await supabase.from('devices').select('*');
-        if (devData && devData.length > 0) {
-          setDevices(devData);
+          const latest = logsData[0];
+          setDevices([
+            {
+              device_id: latest.device_id || 'DEV-ESP32-MAIN-001',
+              name: 'Highway 101 Flood Node',
+              status: latest.status || 'SAFE',
+              last_seen: latest.recorded_at,
+              last_latitude: 37.7749,
+              last_longitude: -122.4194
+            }
+          ]);
         }
 
         const { data: alertData } = await supabase.from('alerts').select('*').order('created_at', { ascending: false });
