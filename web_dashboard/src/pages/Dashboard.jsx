@@ -35,7 +35,7 @@ export default function Dashboard({ statusLogs, devices, alerts }) {
       <div className="metrics-grid">
         <MetricCard
           title="Water Level"
-          value={latestLog.water_level_cm.toFixed(1)}
+          value={(latestLog.water_level_cm != null ? Number(latestLog.water_level_cm) : 0).toFixed(1)}
           unit="cm"
           icon={Shield}
           statusText={latestLog.status}

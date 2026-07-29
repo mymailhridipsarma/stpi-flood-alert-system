@@ -94,7 +94,7 @@ export default function App() {
     fetchData();
     const interval = setInterval(fetchData, 1000);
     return () => clearInterval(interval);
-  }, [devices[0]?.device_id]);
+  }, []);
 
   // Render Page Content based on tab ID
   const renderContent = () => {

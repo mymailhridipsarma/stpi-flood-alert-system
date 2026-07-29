@@ -9,11 +9,11 @@ import {
   ResponsiveContainer 
 } from 'recharts';
 
-export default function HistoryChart({ data }) {
+export default function HistoryChart({ data = [] }) {
   // Format dates for display
-  const chartData = data.map(item => ({
-    time: item.recorded_at ? new Date(item.recorded_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '',
-    'Water Level (cm)': item.water_level_cm,
+  const chartData = (data || []).map(item => ({
+    time: item?.recorded_at ? new Date(item.recorded_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '',
+    'Water Level (cm)': item?.water_level_cm != null ? Number(item.water_level_cm) : 0,
   })).reverse(); // Reverse to read chronologically (left to right)
 
   return (
