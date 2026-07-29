@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { supabase, isSupabaseConfigured } from './supabaseClient';
 import Navigation from './components/Navigation';
 import Dashboard from './pages/Dashboard';
 import MapView from './pages/MapView';
