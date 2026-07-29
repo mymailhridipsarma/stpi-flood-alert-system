@@ -15,8 +15,27 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || `http://${backendHost}
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [devices, setDevices] = useState([]);
-  const [statusLogs, setStatusLogs] = useState([]);
+  const [devices, setDevices] = useState([
+    {
+      device_id: 'DEV-ESP32-MAIN-001',
+      name: 'Highway 101 Flood Node',
+      status: 'SAFE',
+      last_seen: new Date().toISOString(),
+      last_latitude: 37.7749,
+      last_longitude: -122.4194
+    }
+  ]);
+  const [statusLogs, setStatusLogs] = useState([
+    {
+      id: 'init-001',
+      device_id: 'DEV-ESP32-MAIN-001',
+      water_level_cm: 0,
+      status: 'SAFE',
+      wifi_rssi: -75,
+      gps_speed: 0,
+      recorded_at: new Date().toISOString()
+    }
+  ]);
   const [alerts, setAlerts] = useState([]);
   const [detections, setDetections] = useState([]);
 

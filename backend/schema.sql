@@ -50,11 +50,11 @@ CREATE INDEX idx_status_logs_device_recorded ON status_logs(device_id, recorded_
 CREATE INDEX idx_object_detections_device_detected ON object_detections(device_id, detected_at DESC);
 CREATE INDEX idx_alerts_device_created ON alerts(device_id, created_at DESC);
 
--- Automatic Auto-Cleanup Function (Deletes status logs older than 10 seconds)
+-- Automatic Auto-Cleanup Function (Retains status logs for 24 hours)
 CREATE OR REPLACE FUNCTION cleanup_old_status_logs()
 RETURNS trigger AS $$
 BEGIN
-    DELETE FROM status_logs WHERE recorded_at < NOW() - INTERVAL '10 seconds';
+    DELETE FROM status_logs WHERE recorded_at < NOW() - INTERVAL '24 hours';
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
