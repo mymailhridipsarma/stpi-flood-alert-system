@@ -28,13 +28,17 @@ void LcdController::updateData(float waterCm, AlertStatus status, double lat, do
     }
     lastWifiRssi = rssi;
     
-    // Immediately render updated water level & status
+    // Render updated water level & status
     renderCurrentPage();
 }
 
 void LcdController::loop() {
-    // Keep LCD fixed to AquaPulse water level and status screen only (no rotation)
-    renderCurrentPage();
+    // Re-render display every 500ms to keep screen rock-solid without flickering
+    unsigned long now = millis();
+    if (now - lastRotateTime >= 500) {
+        lastRotateTime = now;
+        renderCurrentPage();
+    }
 }
 
 void LcdController::showMessage(const char* line1, const char* line2) {
@@ -58,14 +62,17 @@ void LcdController::renderCurrentPage() {
         statusStr = "WAIT..";
     }
 
-    // Line 1: AquaPulse  <STATUS>
+    // Line 1: AquaPulse  <STATUS> (exactly 16 chars)
     snprintf(buf1, sizeof(buf1), "AquaPulse %-6s", statusStr);
 
-    // Line 2: Water: XX.X cm
+    // Line 2: Water: X.X cm (cleanly formatted without spaces inside number)
     if (lastWaterCm < 0) {
         snprintf(buf2, sizeof(buf2), "Water: ERROR   ");
     } else {
-        snprintf(buf2, sizeof(buf2), "Water: %-5.1f cm", lastWaterCm);
+        char valStr[8];
+        dtostrf(lastWaterCm, 1, 1, valStr); // Format e.g. "0.0" or "12.5"
+        snprintf(buf2, sizeof(buf2), "Water: %s cm    ", valStr);
+        buf2[16] = '\0'; // Ensure exact 16 char termination
     }
 
     lcd.setCursor(0, 0);

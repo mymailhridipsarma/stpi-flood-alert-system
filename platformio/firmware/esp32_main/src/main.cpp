@@ -27,7 +27,7 @@ unsigned long lastSensorReadTime = 0;
 unsigned long lastApiUploadTime = 0;
 
 // Function declarations
-AlertStatus evaluateStatus(float waterCm);
+AlertStatus evaluateStatusByDistance(float distCm);
 void processSerialCamInput();
 
 void setup() {
@@ -79,11 +79,12 @@ void loop() {
         
         float dist = sensor.readDistanceCm();
         if (dist >= 0) {
-            // Assuming the sensor is installed at a height of 50cm
-            float sensorHeight = 50.0;
+            // Base mounting height of ultrasonic sensor: 22.0cm
+            float sensorHeight = SENSOR_BASE_HEIGHT_CM;
             waterLevelCm = sensorHeight - dist;
             if (waterLevelCm < 0) waterLevelCm = 0.0; // clamp to 0
-            currentStatus = evaluateStatus(waterLevelCm);
+            
+            currentStatus = evaluateStatusByDistance(dist);
         } else {
             currentStatus = STATUS_UNKNOWN;
         }
@@ -141,14 +142,14 @@ void loop() {
     lcdCtrl.loop();
 }
 
-AlertStatus evaluateStatus(float waterCm) {
-    if (waterCm < 0) return STATUS_UNKNOWN;
-    // Low water level = SAFE
-    if (waterCm <= WATER_SAFE_MAX_CM) return STATUS_SAFE;
-    // Medium water level = RISKY
-    if (waterCm <= WATER_RISKY_MAX_CM) return STATUS_RISKY;
-    // High water level = DANGER
-    return STATUS_DANGER;
+AlertStatus evaluateStatusByDistance(float distCm) {
+    if (distCm < 0) return STATUS_UNKNOWN;
+    // Sensor distance <= 17.0cm = DANGER
+    if (distCm <= SENSOR_DIST_DANGER_CM) return STATUS_DANGER;
+    // Sensor distance <= 20.0cm (17cm to 20cm range) = RISKY
+    if (distCm <= SENSOR_DIST_RISKY_CM) return STATUS_RISKY;
+    // Sensor distance > 20.0cm (up to 22.0cm base height) = SAFE
+    return STATUS_SAFE;
 }
 
 void processSerialCamInput() {

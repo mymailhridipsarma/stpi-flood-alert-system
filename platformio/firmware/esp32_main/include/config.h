@@ -17,9 +17,10 @@
 #define SUPABASE_REST_URL "https://xhnmjokqxwfhxkrjuidh.supabase.co/rest/v1"
 #define SUPABASE_ANON_KEY "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhobm1qb2txeHdmaHhrcmp1aWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzMDM4MzgsImV4cCI6MjEwMDg3OTgzOH0.6aN0Hm32Tzqzejm4olpcwv-SOvm5EEBW7APlJR9MZ2Y"
 
-// Water Level Thresholds (in cm)
-#define WATER_SAFE_MAX_CM 15.0
-#define WATER_RISKY_MAX_CM 30.0
+// Water Level & Sensor Distance Thresholds (in cm)
+#define SENSOR_BASE_HEIGHT_CM 22.0
+#define SENSOR_DIST_RISKY_CM 20.0
+#define SENSOR_DIST_DANGER_CM 17.0
 
 // Sensor Pins
 #define US_TRIG_PIN 5
