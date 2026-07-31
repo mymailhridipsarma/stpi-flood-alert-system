@@ -89,8 +89,9 @@ void loop() {
             currentStatus = STATUS_UNKNOWN;
         }
 
-        // Update indicators
+        // Update indicators & sync LCD immediately on every 200ms sensor read
         ledCtrl.setStatus(currentStatus);
+        lcdCtrl.updateData(waterLevelCm, currentStatus, 0.0, 0.0, detectedObject, wifiMgr.getRSSI());
     }
 
     // Update buzzer siren (pulsing in Danger)

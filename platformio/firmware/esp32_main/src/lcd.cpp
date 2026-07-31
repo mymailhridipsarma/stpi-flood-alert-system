@@ -28,17 +28,13 @@ void LcdController::updateData(float waterCm, AlertStatus status, double lat, do
     }
     lastWifiRssi = rssi;
     
-    // Render updated water level & status
+    // Immediately render updated water level & status synchronously
     renderCurrentPage();
 }
 
 void LcdController::loop() {
-    // Re-render display every 500ms to keep screen rock-solid without flickering
-    unsigned long now = millis();
-    if (now - lastRotateTime >= 500) {
-        lastRotateTime = now;
-        renderCurrentPage();
-    }
+    // Continuous loop check - renderCurrentPage uses string comparison to avoid flicker
+    renderCurrentPage();
 }
 
 void LcdController::showMessage(const char* line1, const char* line2) {
@@ -52,6 +48,8 @@ void LcdController::showMessage(const char* line1, const char* line2) {
 void LcdController::renderCurrentPage() {
     char buf1[17];
     char buf2[17];
+    static char prevBuf1[17] = "";
+    static char prevBuf2[17] = "";
 
     const char* statusStr = "SAFE  ";
     if (lastStatus == STATUS_RISKY) {
@@ -75,8 +73,16 @@ void LcdController::renderCurrentPage() {
         buf2[16] = '\0'; // Ensure exact 16 char termination
     }
 
-    lcd.setCursor(0, 0);
-    lcd.print(buf1);
-    lcd.setCursor(0, 1);
-    lcd.print(buf2);
+    // Differential hardware update: Only write to I2C LCD lines if text actually changed!
+    if (strcmp(prevBuf1, buf1) != 0) {
+        strcpy(prevBuf1, buf1);
+        lcd.setCursor(0, 0);
+        lcd.print(buf1);
+    }
+
+    if (strcmp(prevBuf2, buf2) != 0) {
+        strcpy(prevBuf2, buf2);
+        lcd.setCursor(0, 1);
+        lcd.print(buf2);
+    }
 }
