@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function MetricCard({ title, value, icon: Icon, statusText, statusType, unit }) {
+export default function MetricCard({ title, value, icon: Icon, statusText, statusType, unit, disableDynamicTheme = false }) {
   const getBadgeClass = () => {
     switch (statusType) {
       case 'success': return 'badge-safe';
@@ -11,6 +11,8 @@ export default function MetricCard({ title, value, icon: Icon, statusText, statu
   };
 
   const getThemeStyle = () => {
+    if (disableDynamicTheme) return { transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' };
+
     switch (statusType) {
       case 'success':
         return {
@@ -42,7 +44,7 @@ export default function MetricCard({ title, value, icon: Icon, statusText, statu
   };
 
   const themeStyle = getThemeStyle();
-  const isCustomThemed = statusType === 'success' || statusType === 'warning' || statusType === 'danger';
+  const isCustomThemed = !disableDynamicTheme && (statusType === 'success' || statusType === 'warning' || statusType === 'danger');
 
   return (
     <div className="glass-panel metric-card" style={themeStyle}>

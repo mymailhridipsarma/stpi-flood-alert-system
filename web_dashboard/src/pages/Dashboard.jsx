@@ -166,6 +166,7 @@ export default function Dashboard({ statusLogs = [], devices = [], alerts = [] }
           icon={ShieldAlert}
           statusText={activeAlerts.length > 0 ? "ACTION REQUIRED" : "ALL SYSTEMS NOMINAL"}
           statusType={activeAlerts.length > 0 ? "danger" : "success"}
+          disableDynamicTheme={true}
         />
         <MetricCard
           title="Monitored Nodes"
@@ -173,6 +174,7 @@ export default function Dashboard({ statusLogs = [], devices = [], alerts = [] }
           icon={NavIcon}
           statusText="AquaPulse node active"
           statusType="success"
+          disableDynamicTheme={true}
         />
       </div>
 
