@@ -1,9 +1,16 @@
-import React from 'react';
-import { Shield, Radio, ShieldAlert, Navigation as NavIcon, Eye } from 'lucide-react';
+import React, { useEffect, useState, useRef } from 'react';
+import { Shield, ShieldAlert, Navigation as NavIcon, BellRing, Volume2, VolumeX, X } from 'lucide-react';
 import MetricCard from '../components/MetricCard';
 import HistoryChart from '../components/HistoryChart';
+import { sendTelegramAlert } from '../services/telegram';
 
-export default function Dashboard({ statusLogs, devices, alerts }) {
+export default function Dashboard({ statusLogs = [], devices = [], alerts = [] }) {
+  const [toastDismissed, setToastDismissed] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const audioCtxRef = useRef(null);
+  const sirenIntervalRef = useRef(null);
+  const lastAlertTimeRef = useRef(0);
+
   // Extract latest report or fallback to empty state
   const latestLog = statusLogs[0] || {
     water_level_cm: 0,
@@ -11,6 +18,8 @@ export default function Dashboard({ statusLogs, devices, alerts }) {
     wifi_rssi: 0,
     recorded_at: null
   };
+
+  const isDanger = latestLog?.status?.toUpperCase() === 'DANGER';
 
   const getStatusType = (status) => {
     switch (status?.toUpperCase()) {
@@ -21,14 +30,155 @@ export default function Dashboard({ statusLogs, devices, alerts }) {
     }
   };
 
-  // Find active alerts count
+  // 1. Web Audio API Emergency Siren for Danger
+  useEffect(() => {
+    if (isDanger && soundEnabled) {
+      const playSirenPulse = () => {
+        try {
+          if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
+            audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+          }
+
+          const ctx = audioCtxRef.current;
+          if (ctx.state === 'suspended') {
+            ctx.resume();
+          }
+
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(880, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.35);
+
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.35);
+        } catch (e) {
+          console.warn("Audio siren error:", e);
+        }
+      };
+
+      playSirenPulse();
+      sirenIntervalRef.current = setInterval(playSirenPulse, 1200);
+    } else {
+      if (sirenIntervalRef.current) {
+        clearInterval(sirenIntervalRef.current);
+        sirenIntervalRef.current = null;
+      }
+      if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
+        audioCtxRef.current.close().catch(() => {});
+        audioCtxRef.current = null;
+      }
+    }
+
+    return () => {
+      if (sirenIntervalRef.current) clearInterval(sirenIntervalRef.current);
+      if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
+        audioCtxRef.current.close().catch(() => {});
+      }
+    };
+  }, [isDanger, soundEnabled]);
+
+  // 2. Trigger Telegram Alert on Danger
+  useEffect(() => {
+    if (isDanger) {
+      const now = Date.now();
+      // Throttle Telegram alerts to once every 2 minutes
+      if (now - lastAlertTimeRef.current > 120000) {
+        lastAlertTimeRef.current = now;
+        sendTelegramAlert('DANGER', latestLog.water_level_cm, devices[0]?.device_id);
+      }
+    }
+  }, [isDanger, latestLog?.water_level_cm]);
+
+  // Reset toast dismissal if status reverts to non-danger then back to danger
+  useEffect(() => {
+    if (!isDanger) {
+      setToastDismissed(false);
+    }
+  }, [isDanger]);
+
   const activeAlerts = alerts.filter(a => !a.resolved);
 
   return (
-    <div>
+    <div style={{ position: 'relative' }}>
+      
+      {/* 3. Top-Right Emergency Alert Toast Notification */}
+      {isDanger && !toastDismissed && (
+        <div 
+          className="danger-toast-notification"
+          style={{
+            position: 'fixed',
+            top: '24px',
+            right: '24px',
+            zIndex: 9999,
+            background: 'linear-gradient(135deg, #ef4444 0%, #991b1b 100%)',
+            color: '#ffffff',
+            padding: '16px 20px',
+            borderRadius: '12px',
+            boxShadow: '0 10px 30px rgba(239, 68, 68, 0.5), 0 0 20px rgba(239, 68, 68, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+            border: '1px solid rgba(255, 255, 255, 0.4)',
+            maxWidth: '380px',
+            animation: 'slideInRight 0.4s ease-out'
+          }}
+        >
+          <div style={{ background: 'rgba(255,255,255,0.2)', padding: '10px', borderRadius: '50%', display: 'flex' }}>
+            <BellRing size={24} style={{ color: '#fff' }} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, letterSpacing: '0.5px' }}>
+              🚨 CRITICAL FLOOD ALERT
+            </h4>
+            <p style={{ margin: '3px 0 0 0', fontSize: '0.82rem', opacity: 0.95, lineHeight: '1.3' }}>
+              DANGER Status Detected! Water level at <b>{(Number(latestLog.water_level_cm) || 0).toFixed(1)} cm</b>.
+            </p>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <button
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              title={soundEnabled ? "Mute Siren" : "Unmute Siren"}
+              style={{
+                background: 'rgba(255,255,255,0.2)',
+                border: 'none',
+                color: '#fff',
+                cursor: 'pointer',
+                padding: '4px',
+                borderRadius: '4px',
+                display: 'flex'
+              }}
+            >
+              {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+            </button>
+            <button
+              onClick={() => setToastDismissed(true)}
+              title="Dismiss Alert"
+              style={{
+                background: 'rgba(255,255,255,0.2)',
+                border: 'none',
+                color: '#fff',
+                cursor: 'pointer',
+                padding: '4px',
+                borderRadius: '4px',
+                display: 'flex'
+              }}
+            >
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+      )}
+
       <header style={{ marginBottom: '32px' }}>
         <h1 className="gradient-text" style={{ fontSize: '2.5rem', fontWeight: 800 }}>Dashboard</h1>
-        <p style={{ color: 'hsl(var(--text-secondary))' }}>Real-time water logging and warning console</p>
+        <p style={{ color: 'hsl(var(--text-secondary))' }}>Real-time AquaPulse water logging and warning console</p>
       </header>
 
       {/* Primary Metrics Grid */}
@@ -48,12 +198,11 @@ export default function Dashboard({ statusLogs, devices, alerts }) {
           statusText={activeAlerts.length > 0 ? "ACTION REQUIRED" : "ALL SYSTEMS NOMINAL"}
           statusType={activeAlerts.length > 0 ? "danger" : "success"}
         />
-
         <MetricCard
           title="Monitored Nodes"
           value={devices.length}
           icon={NavIcon}
-          statusText="Devices registered"
+          statusText="AquaPulse node active"
           statusType="success"
         />
       </div>

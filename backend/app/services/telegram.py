@@ -6,7 +6,7 @@ from app.config import settings
 
 def send_telegram_notification(message: str, bot_token: str = None, chat_id: str = None) -> bool:
     """
-    Sends a formatted alert message via Telegram Bot API using urllib.
+    Sends a formatted HTML alert message via Telegram Bot API using urllib.
     Handles SSL contexts cleanly for macOS environments.
     """
     token = bot_token or settings.TELEGRAM_BOT_TOKEN

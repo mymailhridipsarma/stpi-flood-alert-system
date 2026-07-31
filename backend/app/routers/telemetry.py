@@ -127,13 +127,15 @@ async def post_status(log: StatusLogCreate, _=Depends(verify_device_key)):
                 }).execute()
                 send_push_notification(log.device_id, "CRITICAL WATER LEVEL", alert_msg)
                 send_sms_notification(log.device_id, alert_msg)
-                send_telegram_notification(
-                    f"<b>🚨 CRITICAL WATER LEVEL ALERT</b>\n\n"
-                    f"<b>Device:</b> {log.device_id}\n"
-                    f"<b>Water Level:</b> {log.water_level_cm} cm\n"
-                    f"<b>Status:</b> CRITICAL DANGER\n"
-                    f"<b>Timestamp:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                telegram_msg = (
+                    "<b>🚨 AquaPulse Emergency Flood Alert 🚨</b>\n\n"
+                    f"<b>System Node:</b> AquaPulse Flood Node ({log.device_id})\n"
+                    f"<b>Alert Level:</b> DANGER 🔴\n"
+                    f"<b>Water Level:</b> {log.water_level_cm:.1f} cm\n"
+                    f"<b>Timestamp:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S IST')}\n\n"
+                    "⚠️ <i>IMMEDIATE ACTION REQUIRED! Water level has reached critical flood depth. Avoid hazardous road segments!</i>"
                 )
+                send_telegram_notification(telegram_msg)
 
         elif log.status.upper() == "SAFE" or log.status.upper() == "RISKY":
             # Resolve existing danger alerts automatically
