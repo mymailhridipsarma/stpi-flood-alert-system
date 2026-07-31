@@ -8,7 +8,7 @@ export default function Dashboard({ statusLogs = [], devices = [], alerts = [] }
   const [toastDismissed, setToastDismissed] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const audioCtxRef = useRef(null);
-  const sirenIntervalRef = useRef(null);
+  const chimeIntervalRef = useRef(null);
   const lastAlertTimeRef = useRef(0);
 
   // Extract latest report or fallback to empty state
@@ -30,10 +30,10 @@ export default function Dashboard({ statusLogs = [], devices = [], alerts = [] }
     }
   };
 
-  // 1. Web Audio API Emergency Siren for Danger
+  // 1. Professional Control Room Dual-Chime Alert Sound for Danger
   useEffect(() => {
     if (isDanger && soundEnabled) {
-      const playSirenPulse = () => {
+      const playProfessionalChime = () => {
         try {
           if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
             audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
@@ -44,31 +44,43 @@ export default function Dashboard({ statusLogs = [], devices = [], alerts = [] }
             ctx.resume();
           }
 
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(880, ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.35);
+          const now = ctx.currentTime;
 
-          gain.gain.setValueAtTime(0.2, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+          // Pulse 1: High crisp alert chime (880 Hz - A5)
+          const osc1 = ctx.createOscillator();
+          const gain1 = ctx.createGain();
+          osc1.type = 'sine';
+          osc1.frequency.setValueAtTime(880, now);
+          gain1.gain.setValueAtTime(0.22, now);
+          gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc1.connect(gain1);
+          gain1.connect(ctx.destination);
+          osc1.start(now);
+          osc1.stop(now + 0.35);
 
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.start();
-          osc.stop(ctx.currentTime + 0.35);
+          // Pulse 2: Secondary harmonic chime 120ms later (1174.66 Hz - D6)
+          const osc2 = ctx.createOscillator();
+          const gain2 = ctx.createGain();
+          osc2.type = 'sine';
+          osc2.frequency.setValueAtTime(1174.66, now + 0.12);
+          gain2.gain.setValueAtTime(0.20, now + 0.12);
+          gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+          osc2.connect(gain2);
+          gain2.connect(ctx.destination);
+          osc2.start(now + 0.12);
+          osc2.stop(now + 0.45);
+
         } catch (e) {
-          console.warn("Audio siren error:", e);
+          console.warn("Audio chime error:", e);
         }
       };
 
-      playSirenPulse();
-      sirenIntervalRef.current = setInterval(playSirenPulse, 1200);
+      playProfessionalChime();
+      chimeIntervalRef.current = setInterval(playProfessionalChime, 1500);
     } else {
-      if (sirenIntervalRef.current) {
-        clearInterval(sirenIntervalRef.current);
-        sirenIntervalRef.current = null;
+      if (chimeIntervalRef.current) {
+        clearInterval(chimeIntervalRef.current);
+        chimeIntervalRef.current = null;
       }
       if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
         audioCtxRef.current.close().catch(() => {});
@@ -77,7 +89,7 @@ export default function Dashboard({ statusLogs = [], devices = [], alerts = [] }
     }
 
     return () => {
-      if (sirenIntervalRef.current) clearInterval(sirenIntervalRef.current);
+      if (chimeIntervalRef.current) clearInterval(chimeIntervalRef.current);
       if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
         audioCtxRef.current.close().catch(() => {});
       }
@@ -88,7 +100,6 @@ export default function Dashboard({ statusLogs = [], devices = [], alerts = [] }
   useEffect(() => {
     if (isDanger) {
       const now = Date.now();
-      // Throttle Telegram alerts to once every 2 minutes
       if (now - lastAlertTimeRef.current > 120000) {
         lastAlertTimeRef.current = now;
         sendTelegramAlert('DANGER', latestLog.water_level_cm, devices[0]?.device_id);
@@ -121,7 +132,7 @@ export default function Dashboard({ statusLogs = [], devices = [], alerts = [] }
             color: '#ffffff',
             padding: '16px 20px',
             borderRadius: '12px',
-            boxShadow: '0 10px 30px rgba(239, 68, 68, 0.5), 0 0 20px rgba(239, 68, 68, 0.3)',
+            boxShadow: '0 10px 30px rgba(239, 68, 68, 0.5), 0 0 25px rgba(239, 68, 68, 0.4)',
             display: 'flex',
             alignItems: 'center',
             gap: '14px',
@@ -144,7 +155,7 @@ export default function Dashboard({ statusLogs = [], devices = [], alerts = [] }
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
-              title={soundEnabled ? "Mute Siren" : "Unmute Siren"}
+              title={soundEnabled ? "Mute Sound" : "Unmute Sound"}
               style={{
                 background: 'rgba(255,255,255,0.2)',
                 border: 'none',
