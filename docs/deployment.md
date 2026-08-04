@@ -12,12 +12,7 @@ This guide outlines step-by-step instructions to compile and deploy the **Smart 
    - Click "New Query".
    - Copy the contents of the database schema file [schema.sql](file:///Users/hridipsarma/Documents/PlatformIO/Projects/STPI/SmartFloodSystem/backend/schema.sql) and paste it into the editor.
    - Click **Run** to execute and initialize tables, indexes, and initial mock data.
-3. **Configure Storage Bucket**:
-   - Go to the **Storage** section in the Supabase Sidebar.
-   - Click **New Bucket**.
-   - Name the bucket `flood-images`.
-   - Set the bucket access toggle to **Public** (allowing dashboards to view image links).
-   - Click **Save**.
+3. **Configure Database Permissions**: Ensure the table policies allow access for anonymous reading and authenticated writing.
 
 ---
 
@@ -61,7 +56,7 @@ This guide outlines step-by-step instructions to compile and deploy the **Smart 
    npm install
    ```
 3. Update API Endpoint Configuration:
-   - Edit the base URL in [App.jsx](file:///Users/hridipsarma/Documents/PlatformIO/Projects/STPI/SmartFloodSystem/web_dashboard/src/App.jsx) (Line 10) to point to your local machine IP or cloud instance domain.
+   - Edit the base URL in [App.jsx](file:///D:/stpi-flood-alert-system-main/stpi-flood-alert-system-main/web_dashboard/src/App.jsx) to point to your local machine IP or cloud instance domain.
 4. Launch the local dev server:
    ```bash
    npm run dev
@@ -88,9 +83,9 @@ This guide outlines step-by-step instructions to compile and deploy the **Smart 
 
 ## 5. Firmware Flashing (PlatformIO)
 
-### 5.1 Main ESP32 Node
+### Main ESP32 Node
 1. Navigate to `SmartFloodSystem/platformio/firmware/esp32_main`.
-2. Edit [config.h](file:///Users/hridipsarma/Documents/PlatformIO/Projects/STPI/SmartFloodSystem/platformio/firmware/esp32_main/include/config.h):
+2. Edit `config.h`:
    - Replace `WIFI_SSID` and `WIFI_PASSWORD` with your local router credentials.
    - Replace `API_BASE_URL` with the IP address of your FastAPI backend (e.g., `http://192.168.1.50:8000/api/v1`).
 3. Connect your **ESP32 DevKit V1** to the USB port.
@@ -99,14 +94,3 @@ This guide outlines step-by-step instructions to compile and deploy the **Smart 
    pio run --target upload
    ```
 
-### 5.2 ESP32-CAM Node
-1. Navigate to `SmartFloodSystem/platformio/firmware/esp32_cam`.
-2. Edit [config.h](file:///Users/hridipsarma/Documents/PlatformIO/Projects/STPI/SmartFloodSystem/platformio/firmware/esp32_cam/include/config.h):
-   - Configure local `WIFI_SSID` and `WIFI_PASSWORD`.
-   - Configure `API_UPLOAD_URL` pointing to your backend IP (e.g., `http://192.168.1.50:8000/api/v1/object`).
-3. Connect your **ESP32-CAM AI Thinker** module (using a FTDI Serial Adapter, bridge GPIO 0 to GND to enter download mode).
-4. Compile and upload:
-   ```bash
-   pio run --target upload
-   ```
-5. Remove the GPIO 0 to GND bridge and press RESET to boot the camera firmware.

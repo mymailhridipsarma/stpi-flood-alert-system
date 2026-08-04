@@ -6,7 +6,8 @@ import {
   History, 
   Activity, 
   Settings, 
-  Waves 
+  Waves,
+  Users
 } from 'lucide-react';
 
 const navItems = [
@@ -16,6 +17,7 @@ const navItems = [
   { id: 'history', name: 'History', icon: History },
   { id: 'status', name: 'Device Status', icon: Activity },
   { id: 'admin', name: 'Admin Control', icon: Settings },
+  { id: 'creators', name: 'Creators Info', icon: Users },
 ];
 
 export default function Navigation({ activeTab, setActiveTab }) {

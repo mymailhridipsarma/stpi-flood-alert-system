@@ -7,6 +7,7 @@ import Analytics from './pages/Analytics';
 import History from './pages/History';
 import DeviceStatus from './pages/DeviceStatus';
 import Admin from './pages/Admin';
+import CreatorsInfo from './pages/CreatorsInfo';
 
 const DEFAULT_BACKEND_IP = '192.168.1.114';
 const currentHost = window.location.hostname;
@@ -37,7 +38,6 @@ export default function App() {
     }
   ]);
   const [alerts, setAlerts] = useState([]);
-  const [detections, setDetections] = useState([]);
 
   // Fetch telemetry and alerts data from API or Supabase
   const fetchData = async () => {
@@ -95,15 +95,6 @@ export default function App() {
         const alertData = await alertRes.json();
         setAlerts(prev => prev.length !== alertData.length || (alertData.length > 0 && prev[0]?.id !== alertData[0].id) ? alertData : prev);
       }
-
-      // Fetch detections
-      const detRes = await fetch(`${API_BASE_URL}/object/recent`);
-      if (detRes.ok) {
-        const detData = await detRes.json();
-        if (detData.length > 0) {
-          setDetections(prev => prev.length === 0 || prev[0].id !== detData[0].id ? detData : prev);
-        }
-      }
     } catch (error) {
       console.warn('FastAPI backend offline. Operating in simulation mode with local states.');
     }
@@ -130,6 +121,8 @@ export default function App() {
         return <DeviceStatus devices={devices} statusLogs={statusLogs} />;
       case 'admin':
         return <Admin />;
+      case 'creators':
+        return <CreatorsInfo />;
       default:
         return <Dashboard statusLogs={statusLogs} devices={devices} alerts={alerts} />;
     }

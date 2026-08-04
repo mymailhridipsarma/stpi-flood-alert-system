@@ -62,16 +62,6 @@ curl -X POST "http://localhost:8000/api/v1/location?device_id=DEV-ESP32-MAIN-001
      -H "x-device-key: esp32-super-secret-api-key-2026"
 ```
 
-### 2.4 Post ESP32-CAM AI Detection (Simulated Hazard)
-```bash
-curl -X POST "http://localhost:8000/api/v1/object" \
-     -H "x-device-key: esp32-super-secret-api-key-2026" \
-     -F "device_id=DEV-ESP32-CAM-001" \
-     -F "object_name=person" \
-     -F "confidence=0.92" \
-     -F "bounding_box={\"x\": 200, \"y\": 150, \"w\": 120, \"h\": 250}"
-```
-
 ---
 
 ## 3. UI Dashboard Testing
@@ -80,11 +70,11 @@ curl -X POST "http://localhost:8000/api/v1/object" \
 - Open the React dashboard at `http://localhost:5173`.
 - Verify the **Metric Cards** refresh automatically.
 - Check the **Geospatial Map** tab: The marker for `DEV-ESP32-MAIN-001` should change colors from green to yellow/red dynamically as you submit different cURL payloads.
-- In **AI Camera Feed**, verify the uploaded object is displayed, showing a bounding box drawn over the image coordinates.
 
 ### 3.2 Flutter Application
 - Run the Flutter app and log in with the simulation credentials:
   - **Email**: `admin@flood.com`
   - **Password**: `admin123`
 - Verify the side navigation drawer loads the Emergency Contacts list and System Alerts notifications properly.
-- Verify bottom navigation switches tabs correctly between Overview, Map, Camera, and History logs.
+- Verify bottom navigation switches tabs correctly between Overview, Map, and History logs.
+

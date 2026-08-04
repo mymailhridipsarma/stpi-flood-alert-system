@@ -20,22 +20,10 @@ For standalone roadside deployments, the node should be powered by solar energy:
 
 ---
 
-## 2. On-Device Edge Impulse Model Deployment
-
-Instead of sending camera frames to the backend for cloud inference, execution can happen locally on the ESP32-CAM to save bandwidth:
-
-1. **Dataset Acquisition**: Collect road water logging images containing cars, people, bikes, and debris.
-2. **Model Training**: Upload images to [Edge Impulse Studio](https://edgeimpulse.com), set up an object detection impulse (FOMO - Faster Objects, More Objects) which runs extremely fast on microcontroller architectures.
-3. **Firmware Integration**:
-   - Download the trained C++ library package from Edge Impulse.
-   - Place it inside the `esp32_cam` PlatformIO project's `lib` directory.
-   - Modify `camera.cpp` to run local classification on captured frame buffers and print detected obstacles directly onto the Serial TX channel.
-
----
-
-## 3. Real-world Alerts Integration
+## 2. Real-world Alerts Integration
 
 Replace SMS and push notification placeholders with operational gateways:
+
 
 ### 3.1 Twilio SMS Broadcast
 - In `backend/app/routers/telemetry.py`, initialize the Twilio client using environment credentials:

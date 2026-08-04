@@ -167,59 +167,9 @@ All API routes are prefixed with `/api/v1`.
 
 ---
 
-## 4. ESP32-CAM AI Endpoints
+## 4. System Alerts Endpoints
 
-### 4.1 Upload Object Detection Image
-- **Route**: `POST /object`
-- **Headers**: `x-device-key: esp32-super-secret-api-key-2026`, `Content-Type: multipart/form-data`
-- **Form Data Parameters**:
-  - `device_id`: `DEV-ESP32-CAM-001` (string)
-  - `object_name`: `person` (string)
-  - `confidence`: `0.89` (float)
-  - `bounding_box`: `{"x": 250, "y": 180, "w": 100, "h": 200}` (JSON string, optional)
-  - `image`: `[File Binary Upload]` (optional)
-- **Response (200 OK)**:
-```json
-{
-  "status": "success",
-  "data": [
-    {
-      "id": "e932b-...",
-      "device_id": "DEV-ESP32-CAM-001",
-      "object_name": "person",
-      "confidence": 0.89,
-      "image_url": "https://supabase-url.../flood-images/DEV-ESP32-CAM-001_capture.jpg",
-      "detected_at": "2026-07-15T11:45:05.000Z"
-    }
-  ]
-}
-```
-
-### 4.2 Fetch Recent Object Detections
-- **Route**: `GET /object/recent`
-- **Query Parameters**:
-  - `device_id`: `DEV-ESP32-CAM-001` (optional)
-  - `limit`: `20` (optional, default 20)
-- **Response (200 OK)**:
-```json
-[
-  {
-    "id": "e932b-...",
-    "device_id": "DEV-ESP32-CAM-001",
-    "object_name": "person",
-    "confidence": 0.89,
-    "bounding_box": {"x": 250, "y": 180, "w": 100, "h": 200},
-    "image_url": "https://supabase-url.../flood-images/DEV-ESP32-CAM-001_capture.jpg",
-    "detected_at": "2026-07-15T11:45:05.000Z"
-  }
-]
-```
-
----
-
-## 5. System Alerts Endpoints
-
-### 5.1 Get Alerts
+### 4.1 Get Alerts
 - **Route**: `GET /alerts`
 - **Query Parameters**:
   - `device_id`: `DEV-ESP32-MAIN-001` (optional)
@@ -239,7 +189,7 @@ All API routes are prefixed with `/api/v1`.
 ]
 ```
 
-### 5.2 Mark Alert Resolved
+### 4.2 Mark Alert Resolved
 - **Route**: `POST /alerts/resolve/{alert_id}`
 - **Headers**: `Authorization: Bearer [JWT]`
 - **Response (200 OK)**:
@@ -255,3 +205,4 @@ All API routes are prefixed with `/api/v1`.
   ]
 }
 ```
+

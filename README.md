@@ -1,6 +1,6 @@
 # Smart Water Logging & Flood Alert System
 
-A production-grade, end-to-end IoT system designed to detect road water levels, evaluate vehicle passage safety, recognize obstacles using camera AI, and broadcast emergency alerts to web dashboards and mobile devices in real time.
+A production-grade, end-to-end IoT system designed to detect road water levels, evaluate vehicle passage safety, and broadcast emergency alerts to web dashboards and mobile devices in real time.
 
 ---
 
@@ -12,19 +12,15 @@ A production-grade, end-to-end IoT system designed to detect road water levels, 
   - Rotates diagnostic metrics on a local **16x2 I2C LCD Display**.
   - Drives safety LEDs (Green/Yellow/Red) and triggers an active buzzer during critical status.
   - Implements a hardware watchdog, WiFi auto-recovery, and **SPIFFS offline caching** to log data when connection drops.
-- **ESP32-CAM Firmware**:
-  - Captures road images every 5 seconds.
-  - Transmits JPEG binary payloads to the cloud backend for AI object classification.
-  - Relays classifications directly to the main controller's LCD display via serial TX.
 - **FastAPI Cloud Backend**:
   - Exposes secure REST endpoints.
   - Interfaces with a **Supabase PostgreSQL** database.
   - Secures operations using JWT-based Email logins.
-  - Evaluates emergency rules (e.g., if a Person or Vehicle is detected while the water logging level is high, it triggers an instant alert).
+  - Evaluates emergency rules (e.g., if water logging depth exceeds safety thresholds, it triggers an instant alert).
 - **Vite React Web Dashboard**:
   - Dark mode design system.
   - Displays water logging depth history on charts and maps device locations using **Leaflet Maps**.
-  - Includes diagnostic specs, camera feed panels, and threshold control centers.
+  - Includes diagnostic specs and threshold control centers.
 - **Flutter Mobile Application**:
   - Cross-platform Android/iOS client.
   - Features real-time map views, threat notification centers, and distress contacts directories.
@@ -37,8 +33,7 @@ A production-grade, end-to-end IoT system designed to detect road water levels, 
 SmartFloodSystem/
 ├── platformio/
 │   └── firmware/
-│       ├── esp32_main/       # ESP32 main sensor node firmware
-│       └── esp32_cam/        # ESP32-CAM capture and upload firmware
+│       └── esp32_main/       # ESP32 main sensor node firmware
 ├── backend/                  # FastAPI + Supabase backend API
 ├── web_dashboard/            # React + Vite web application
 ├── mobile_app/               # Flutter mobile application
@@ -47,7 +42,7 @@ SmartFloodSystem/
 │   ├── api.md                # FastAPI REST API references
 │   ├── deployment.md         # Step-by-step compilation & installation guide
 │   ├── testing.md            # Hardware verification & simulated cURL testing
-│   └── future_enhancements.md# Roadmaps for solar telemetry & Edge Impulse models
+│   └── future_enhancements.md# Roadmaps for solar telemetry & system enhancements
 └── README.md                 # Project landing page (this file)
 ```
 
