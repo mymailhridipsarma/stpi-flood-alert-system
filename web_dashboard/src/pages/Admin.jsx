@@ -101,7 +101,7 @@ export default function Admin() {
         <p style={{ color: 'hsl(var(--text-secondary))' }}>Configure thresholds, alarm limits, and alert integrations</p>
       </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+      <div className="admin-main-grid">
         
         {/* Water Level Threshold Config */}
         <div className="glass-panel" style={{ padding: '24px' }}>
@@ -213,14 +213,14 @@ export default function Admin() {
             ))}
           </div>
 
-          <form onSubmit={addContact} style={{ display: 'flex', gap: '10px' }}>
+          <form onSubmit={addContact} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <input 
               type="text" 
               placeholder="Name"
               value={newContact.name}
               onChange={(e) => setNewContact({ ...newContact, name: e.target.value })}
               style={{
-                flex: 1,
+                flex: '1 1 140px',
                 padding: '10px',
                 borderRadius: '6px',
                 border: '1px solid hsl(var(--border))',
@@ -236,7 +236,7 @@ export default function Admin() {
               value={newContact.phone}
               onChange={(e) => setNewContact({ ...newContact, phone: e.target.value })}
               style={{
-                flex: 1,
+                flex: '1 1 140px',
                 padding: '10px',
                 borderRadius: '6px',
                 border: '1px solid hsl(var(--border))',
@@ -265,184 +265,13 @@ export default function Admin() {
           </form>
         </div>
 
-        {/* Telegram Bot Integration Card */}
-        <div className="glass-panel" style={{ padding: '24px', gridColumn: 'span 2' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h3 style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Send size={20} style={{ color: '#0088cc' }} />
-              Telegram Emergency Alert Bot Integration
-            </h3>
-            <button 
-              onClick={() => setShowTelegramHelp(!showTelegramHelp)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                background: 'none',
-                border: 'none',
-                color: '#0088cc',
-                cursor: 'pointer',
-                fontSize: '0.85rem',
-                fontWeight: 600
-              }}
-            >
-              <HelpCircle size={16} />
-              {showTelegramHelp ? 'Hide Setup Guide' : 'How to set up?'}
-            </button>
-          </div>
-
-          {/* Setup Guide Accordion */}
-          {showTelegramHelp && (
-            <div style={{ 
-              padding: '16px', 
-              borderRadius: '8px', 
-              background: 'rgba(0, 136, 204, 0.08)', 
-              border: '1px solid rgba(0, 136, 204, 0.3)',
-              marginBottom: '20px',
-              fontSize: '0.85rem',
-              color: 'hsl(var(--text-secondary))'
-            }}>
-              <h4 style={{ color: '#0088cc', marginBottom: '8px', fontWeight: 600 }}>Quick Setup Instructions:</h4>
-              <ol style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <li>Open Telegram and search for <b>@BotFather</b>.</li>
-                <li>Send <code>/newbot</code> command, give your bot a name (e.g. <i>MyFloodAlertBot</i>) and a username ending in <code>bot</code>.</li>
-                <li>Copy the <b>HTTP API Token</b> given by BotFather (e.g. <code>123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ</code>) and paste it into <b>Bot Token</b> below.</li>
-                <li>Search for <b>@userinfobot</b> on Telegram, start a chat, and copy your numeric <b>Id</b> (e.g. <code>987654321</code>). Paste it into <b>Chat ID</b> below.</li>
-                <li>Start a chat with your newly created bot on Telegram by pressing <b>/start</b>.</li>
-                <li>Click <b>Save Telegram Settings</b> and then click <b>Send Test Notification</b> to confirm!</li>
-              </ol>
-            </div>
-          )}
-
-          <form onSubmit={saveTelegramConfig} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <div>
-              <label style={{ fontSize: '0.85rem', color: 'hsl(var(--text-secondary))', display: 'block', marginBottom: '8px' }}>
-                Telegram Bot Token
-              </label>
-              <input 
-                type="text" 
-                placeholder="e.g. 7123456789:AAFx...xyz"
-                value={telegramToken}
-                onChange={(e) => setTelegramToken(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  border: '1px solid hsl(var(--border))',
-                  backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                  color: 'hsl(var(--text-primary))',
-                  outline: 'none',
-                  fontSize: '0.85rem'
-                }}
-              />
-            </div>
-            <div>
-              <label style={{ fontSize: '0.85rem', color: 'hsl(var(--text-secondary))', display: 'block', marginBottom: '8px' }}>
-                Telegram Target Chat ID / Channel ID
-              </label>
-              <input 
-                type="text" 
-                placeholder="e.g. 987654321 or -100123456789"
-                value={telegramChatId}
-                onChange={(e) => setTelegramChatId(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  border: '1px solid hsl(var(--border))',
-                  backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                  color: 'hsl(var(--text-primary))',
-                  outline: 'none',
-                  fontSize: '0.85rem'
-                }}
-              />
-            </div>
-
-            {/* Status Alert Banner */}
-            {telegramStatus && (
-              <div style={{
-                gridColumn: 'span 2',
-                padding: '12px',
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                fontSize: '0.85rem',
-                backgroundColor: telegramStatus.type === 'success' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                border: `1px solid ${telegramStatus.type === 'success' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-                color: telegramStatus.type === 'success' ? '#10b981' : '#ef4444'
-              }}>
-                {telegramStatus.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
-                <span>{telegramStatus.text}</span>
-              </div>
-            )}
-
-            <div style={{ gridColumn: 'span 2', display: 'flex', gap: '12px', marginTop: '8px' }}>
-              <button 
-                type="submit"
-                className="glass-panel"
-                style={{
-                  flex: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  padding: '12px',
-                  background: 'linear-gradient(135deg, rgba(0, 136, 204, 0.25) 0%, rgba(0, 242, 254, 0.15) 100%)',
-                  border: '1px solid rgba(0, 136, 204, 0.4)',
-                  borderRadius: '8px',
-                  color: '#0088cc',
-                  fontWeight: 600,
-                  cursor: 'pointer'
-                }}
-              >
-                <Save size={18} />
-                Save Telegram Settings
-              </button>
-
-              <button 
-                type="button"
-                onClick={testTelegramAlert}
-                disabled={isTestingTelegram}
-                className="glass-panel"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  padding: '12px 24px',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px',
-                  color: 'hsl(var(--text-primary))',
-                  fontWeight: 600,
-                  cursor: isTestingTelegram ? 'wait' : 'pointer',
-                  opacity: isTestingTelegram ? 0.6 : 1
-                }}
-              >
-                <Send size={18} />
-                {isTestingTelegram ? 'Sending Test...' : 'Send Test Notification'}
-              </button>
-            </div>
-          </form>
-        </div>
-
         {/* Global System Integration */}
-        <div className="glass-panel" style={{ padding: '24px', gridColumn: 'span 2' }}>
+        <div className="glass-panel full-width-card" style={{ padding: '24px' }}>
           <h3 style={{ marginBottom: '20px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
             <BellRing size={20} style={{ color: 'hsl(var(--primary))' }} />
             Notification Broadcast Channels
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
-              <input 
-                type="checkbox" 
-                checked={alertConfig.sendTelegram}
-                onChange={(e) => setAlertConfig({ ...alertConfig, sendTelegram: e.target.checked })}
-                style={{ width: '18px', height: '18px' }}
-              />
-              <span style={{ fontSize: '0.9rem', color: 'hsl(var(--text-primary))' }}>Enable Telegram Bot Broadcasts</span>
-            </label>
             <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
               <input 
                 type="checkbox" 

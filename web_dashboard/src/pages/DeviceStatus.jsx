@@ -29,7 +29,7 @@ export default function DeviceStatus({ devices, statusLogs }) {
         <p style={{ color: 'hsl(var(--text-secondary))' }}>Detailed hardware status and communication telemetry</p>
       </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+      <div className="device-status-grid">
         
         {/* Device Specifications */}
         <div className="glass-panel" style={{ padding: '24px' }}>
@@ -94,7 +94,7 @@ export default function DeviceStatus({ devices, statusLogs }) {
         </div>
 
         {/* Pinout & GPIO Diagnostics */}
-        <div className="glass-panel" style={{ padding: '24px', gridColumn: 'span 2' }}>
+        <div className="glass-panel full-width-card" style={{ padding: '24px' }}>
           <h3 style={{ marginBottom: '20px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Activity size={20} style={{ color: 'hsl(var(--primary))' }} />
             Active GPIO Pin Diagnostics

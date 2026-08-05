@@ -13,6 +13,7 @@ const creators = [
   {
     name: 'Hridip Sarma',
     avatar: 'HS',
+    profilePic: '/Profile pic/Hridip Sarma.jpg',
     gradient: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
     socials: {
       instagram: 'https://www.instagram.com/hridip_sarma?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==',
@@ -23,6 +24,7 @@ const creators = [
   {
     name: 'Abhijeet Das',
     avatar: 'AD',
+    profilePic: '/Profile pic/Abhijeet Das.jpg',
     gradient: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
     socials: {
       instagram: 'https://www.instagram.com/abhijeet_hoi/?__pwa=1',
@@ -33,6 +35,7 @@ const creators = [
   {
     name: 'Prachi Saud',
     avatar: 'PS',
+    profilePic: '/Profile pic/Prachi Saud.jpg',
     gradient: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
     socials: {
       instagram: 'https://www.instagram.com/prachi__saud?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==',
@@ -71,8 +74,15 @@ export default function CreatorsInfo() {
           <div key={index} className="glass-panel creator-card">
             {/* Card Top / Avatar Section */}
             <div className="creator-header">
-              <div className="creator-avatar" style={{ background: creator.gradient }}>
-                {creator.avatar}
+              <div className="creator-avatar" style={{ background: creator.gradient, overflow: 'hidden', padding: 0 }}>
+                {creator.profilePic ? (
+                  <img 
+                    src={creator.profilePic} 
+                    alt={creator.name} 
+                  />
+                ) : (
+                  creator.avatar
+                )}
               </div>
               <div className="creator-title-area">
                 <h2 className="creator-name">{creator.name}</h2>

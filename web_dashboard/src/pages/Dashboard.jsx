@@ -54,11 +54,11 @@ export default function Dashboard({ statusLogs = [], devices = [], alerts = [] }
     };
   }, [isDanger, soundEnabled]);
 
-  // 2. Trigger Telegram Alert on Danger
+  // 2. Trigger Automatic Emergency Telegram / SMS Alert on Danger
   useEffect(() => {
     if (isDanger) {
       const now = Date.now();
-      if (now - lastAlertTimeRef.current > 120000) {
+      if (now - lastAlertTimeRef.current > 120000) { // Throttle alerts to once per 2 minutes
         lastAlertTimeRef.current = now;
         sendTelegramAlert('DANGER', latestLog.water_level_cm, devices[0]?.device_id);
       }
@@ -178,7 +178,7 @@ export default function Dashboard({ statusLogs = [], devices = [], alerts = [] }
         />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', marginTop: '32px' }}>
+      <div className="dashboard-content-grid" style={{ marginTop: '32px' }}>
         {/* Telemetry Chart */}
         <div className="glass-panel" style={{ padding: '24px' }}>
           <h3 style={{ marginBottom: '20px', fontWeight: 600 }}>Water Level History (Dynamic Feed)</h3>

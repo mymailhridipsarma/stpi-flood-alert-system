@@ -25,36 +25,40 @@ export default function HistoryChart({ data = [] }) {
         >
           <defs>
             <linearGradient id="colorLevel" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4}/>
-              <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+              <stop offset="5%" stopColor="#0284c7" stopOpacity={0.5}/>
+              <stop offset="95%" stopColor="#38bdf8" stopOpacity={0.02}/>
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--table-border)" opacity={0.6} />
           <XAxis 
             dataKey="time" 
-            stroke="hsl(var(--text-secondary))" 
+            stroke="var(--text-secondary-color)" 
             fontSize={12} 
             tickLine={false} 
           />
           <YAxis 
-            stroke="hsl(var(--text-secondary))" 
+            stroke="var(--text-secondary-color)" 
             fontSize={12} 
             tickLine={false}
             domain={[-10, 'auto']}
           />
           <Tooltip 
             contentStyle={{ 
-              backgroundColor: '#0f172a', 
-              borderColor: 'hsl(var(--border))',
-              color: 'hsl(var(--text-primary))',
-              borderRadius: '8px'
+              background: 'var(--glass-bg)', 
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              borderColor: 'var(--glass-border)',
+              color: 'var(--text-primary-color)',
+              borderRadius: '12px',
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
+              fontWeight: 600
             }} 
           />
           <Area 
             type="natural" 
             dataKey="Water Level (cm)" 
-            stroke="hsl(var(--primary))" 
-            strokeWidth={2}
+            stroke="#0284c7" 
+            strokeWidth={3}
             fillOpacity={1} 
             fill="url(#colorLevel)"
             isAnimationActive={true}
