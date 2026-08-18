@@ -98,11 +98,11 @@ export default function App() {
       if (fetchedLogs && fetchedLogs.length > 0) {
         setStatusLogs(prev => {
           const latestLog = fetchedLogs[0];
-          const isFresh = (new Date() - new Date(latestLog.recorded_at)) < 15000;
+          const isFresh = (new Date() - new Date(latestLog.recorded_at)) < 10000;
           if (isFresh) {
             return fetchedLogs.slice(0, 30);
           }
-          // If DB data is older, attach live 7-second tick with current timestamp
+          // Attach live 7-second tick point matching current water level
           const currentLevel = Math.max(0.0, Number((Number(latestLog.water_level_cm || 0)).toFixed(1)));
           const liveTickPoint = {
             id: `tick-${Date.now()}`,
@@ -156,7 +156,7 @@ export default function App() {
         }
       }
     } catch (error) {
-      console.warn('Telemetry sync handler fallback:', error);
+      console.warn('Telemetry sync fallback:', error);
     }
   };
 

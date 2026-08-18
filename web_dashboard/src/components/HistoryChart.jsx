@@ -40,7 +40,7 @@ export default function HistoryChart({ data = [] }) {
             stroke="var(--text-secondary-color)" 
             fontSize={12} 
             tickLine={false}
-            domain={[0, 'auto']}
+            domain={[-5, 'auto']}
           />
           <Tooltip 
             contentStyle={{ 
@@ -61,9 +61,7 @@ export default function HistoryChart({ data = [] }) {
             strokeWidth={3}
             fillOpacity={1} 
             fill="url(#colorLevel)"
-            isAnimationActive={true}
-            animationDuration={600}
-            animationEasing="ease-in-out"
+            isAnimationActive={false}
           />
         </AreaChart>
       </ResponsiveContainer>
