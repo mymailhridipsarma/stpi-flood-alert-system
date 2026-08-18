@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   AreaChart, 
   Area, 
@@ -10,17 +10,54 @@ import {
 } from 'recharts';
 
 export default function HistoryChart({ data = [] }) {
-  // Format dates for display
-  const chartData = (data || []).map(item => ({
-    time: item?.recorded_at ? new Date(item.recorded_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '',
-    'Water Level (cm)': item?.water_level_cm != null ? Number(item.water_level_cm) : 0,
-  })).reverse(); // Reverse to read chronologically (left to right)
+  const [flowingPoints, setFlowingPoints] = useState([]);
+
+  // Get latest water level reading
+  const latestItem = data && data.length > 0 ? data[0] : null;
+  const latestWaterLevel = latestItem?.water_level_cm != null ? Number(latestItem.water_level_cm) : 0;
+
+  // Keep the graph flowing continuously every 1 second, even if water level reading is static
+  useEffect(() => {
+    const updateFlow = () => {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      setFlowingPoints(prev => {
+        const newPoint = {
+          time: timeStr,
+          'Water Level (cm)': latestWaterLevel
+        };
+
+        // Initialize timeline points on first render
+        if (prev.length === 0) {
+          const initialPoints = [];
+          for (let i = 19; i >= 0; i--) {
+            const pastTime = new Date(now.getTime() - i * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const historicalVal = data && data[i] && data[i].water_level_cm != null ? Number(data[i].water_level_cm) : latestWaterLevel;
+            initialPoints.push({
+              time: pastTime,
+              'Water Level (cm)': historicalVal
+            });
+          }
+          return initialPoints;
+        }
+
+        // Append new timestamped point and slide window (keep last 20 points flowing)
+        const updated = [...prev, newPoint];
+        return updated.slice(-20);
+      });
+    };
+
+    updateFlow();
+    const interval = setInterval(updateFlow, 1000);
+    return () => clearInterval(interval);
+  }, [latestWaterLevel]);
 
   return (
     <div style={{ width: '100%', height: 300 }}>
       <ResponsiveContainer>
         <AreaChart
-          data={chartData}
+          data={flowingPoints}
           margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
         >
           <defs>
@@ -33,14 +70,14 @@ export default function HistoryChart({ data = [] }) {
           <XAxis 
             dataKey="time" 
             stroke="var(--text-secondary-color)" 
-            fontSize={12} 
+            fontSize={11} 
             tickLine={false} 
           />
           <YAxis 
             stroke="var(--text-secondary-color)" 
             fontSize={12} 
             tickLine={false}
-            domain={[-10, 'auto']}
+            domain={[-5, 'auto']}
           />
           <Tooltip 
             contentStyle={{ 
@@ -55,15 +92,15 @@ export default function HistoryChart({ data = [] }) {
             }} 
           />
           <Area 
-            type="natural" 
+            type="monotone" 
             dataKey="Water Level (cm)" 
             stroke="#0284c7" 
             strokeWidth={3}
             fillOpacity={1} 
             fill="url(#colorLevel)"
             isAnimationActive={true}
-            animationDuration={400}
-            animationEasing="ease-out"
+            animationDuration={300}
+            animationEasing="ease-in-out"
           />
         </AreaChart>
       </ResponsiveContainer>
