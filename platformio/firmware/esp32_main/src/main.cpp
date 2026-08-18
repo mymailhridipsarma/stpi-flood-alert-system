@@ -58,6 +58,30 @@ void setup() {
     delay(2000);
 }
 
+float getPreciseDistanceCm() {
+    float samples[3];
+    int validCount = 0;
+    for (int i = 0; i < 3; i++) {
+        float d = sensor.readDistanceCm();
+        if (d >= 0) {
+            samples[validCount++] = d;
+        }
+        delayMicroseconds(300);
+    }
+    if (validCount == 0) return -1.0;
+    
+    for (int i = 0; i < validCount - 1; i++) {
+        for (int j = i + 1; j < validCount; j++) {
+            if (samples[i] > samples[j]) {
+                float tmp = samples[i];
+                samples[i] = samples[j];
+                samples[j] = tmp;
+            }
+        }
+    }
+    return samples[validCount / 2];
+}
+
 void loop() {
     // Feed the watchdog
     esp_task_wdt_reset();
@@ -73,11 +97,11 @@ void loop() {
 
     unsigned long now = millis();
 
-    // 1. Measure water level every 1 second
+    // 1. Measure water level every 50ms (ultra-fast & precise)
     if (now - lastSensorReadTime >= SENSOR_READ_INTERVAL) {
         lastSensorReadTime = now;
         
-        float dist = sensor.readDistanceCm();
+        float dist = getPreciseDistanceCm();
         if (dist >= 0) {
             // Base mounting height of ultrasonic sensor: 22.0cm
             float sensorHeight = SENSOR_BASE_HEIGHT_CM;
@@ -89,7 +113,7 @@ void loop() {
             currentStatus = STATUS_UNKNOWN;
         }
 
-        // Update indicators & sync LCD immediately on every 200ms sensor read
+        // Update indicators & sync LCD immediately on every 50ms sensor read
         ledCtrl.setStatus(currentStatus);
         lcdCtrl.updateData(waterLevelCm, currentStatus, 0.0, 0.0, detectedObject, wifiMgr.getRSSI());
     }

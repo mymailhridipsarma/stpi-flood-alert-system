@@ -111,8 +111,39 @@ export default function App() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 4000);
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchData, 1000);
+
+    let channel = null;
+    if (isSupabaseConfigured) {
+      channel = supabase
+        .channel('realtime_status_logs')
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'status_logs' },
+          (payload) => {
+            if (payload.new) {
+              const newLog = payload.new;
+              setStatusLogs((prev) => [newLog, ...prev.slice(0, 19)]);
+              setDevices([
+                {
+                  device_id: newLog.device_id || 'DEV-ESP32-MAIN-001',
+                  name: 'AquaPulse Flood Node',
+                  status: newLog.status || 'SAFE',
+                  last_seen: newLog.recorded_at,
+                  last_latitude: 37.7749,
+                  last_longitude: -122.4194
+                }
+              ]);
+            }
+          }
+        )
+        .subscribe();
+    }
+
+    return () => {
+      clearInterval(interval);
+      if (channel) supabase.removeChannel(channel);
+    };
   }, []);
 
   // Render Page Content based on tab ID
