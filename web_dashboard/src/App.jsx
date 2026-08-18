@@ -39,8 +39,12 @@ export default function App() {
   ]);
   const [alerts, setAlerts] = useState([]);
 
+  const isFetchingRef = React.useRef(false);
+
   // Fetch telemetry and alerts data from API or Supabase
   const fetchData = async () => {
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
     try {
       if (isSupabaseConfigured) {
         const { data: logsData } = await supabase
@@ -67,6 +71,9 @@ export default function App() {
 
         const { data: alertData } = await supabase.from('alerts').select('*').order('created_at', { ascending: false });
         if (alertData) setAlerts(alertData);
+        
+        const { data: detData } = await supabase.from('object_detections').select('*').order('detected_at', { ascending: false }).limit(20);
+        if (detData) setDetections(detData);
         return;
       }
 
@@ -97,12 +104,14 @@ export default function App() {
       }
     } catch (error) {
       console.warn('FastAPI backend offline. Operating in simulation mode with local states.');
+    } finally {
+      isFetchingRef.current = false;
     }
   };
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 1000);
+    const interval = setInterval(fetchData, 1500);
     return () => clearInterval(interval);
   }, []);
 
