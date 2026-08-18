@@ -16,26 +16,12 @@ struct TelemetryReport {
     double longitude;
 };
 
-struct TelemetryPayload {
-    char deviceId[32];
-    float waterLevelCm;
-    char status[16];
-    int wifiRssi;
-    float gpsSpeed;
-    double latitude;
-    double longitude;
-};
-
 class ApiClient {
 private:
     String baseUrl;
     String apiKey;
     bool spiffsActive;
     const char* cacheFilePath;
-    QueueHandle_t telemetryQueue;
-    TaskHandle_t networkTaskHandle;
-
-    static void networkTaskFunc(void* parameter);
 
 public:
     /**
@@ -44,17 +30,12 @@ public:
     ApiClient(String url, String key);
 
     /**
-     * Initializes file system storage for offline cache and async FreeRTOS worker.
+     * Initializes file system storage for offline cache.
      */
     void begin();
 
     /**
-     * Pushes telemetry reading to non-blocking queue for async Core 0 processing.
-     */
-    bool queueTelemetry(TelemetryReport report);
-
-    /**
-     * Uploads telemetry reading directly. If connection fails, caches to flash.
+     * Uploads telemetry reading. If connection fails, caches to flash.
      * @param report Telemetry details.
      */
     bool sendTelemetry(TelemetryReport report);

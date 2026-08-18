@@ -39,165 +39,71 @@ export default function App() {
   ]);
   const [alerts, setAlerts] = useState([]);
 
-  // Fetch telemetry, device status, and alerts data every 4.5 seconds
+  // Fetch telemetry and alerts data from API or Supabase
   const fetchData = async () => {
     try {
-      let fetchedLogs = null;
-      let fetchedDevices = null;
-      let fetchedAlerts = null;
-
       if (isSupabaseConfigured) {
         const { data: logsData } = await supabase
           .from('status_logs')
           .select('*')
           .order('recorded_at', { ascending: false })
-          .limit(30);
+          .limit(20);
 
         if (logsData && logsData.length > 0) {
-          fetchedLogs = logsData;
-        }
+          setStatusLogs(logsData);
 
-        const { data: devData } = await supabase.from('devices').select('*');
-        if (devData && devData.length > 0) {
-          fetchedDevices = devData;
+          const latest = logsData[0];
+          setDevices([
+            {
+              device_id: latest.device_id || 'DEV-ESP32-MAIN-001',
+              name: 'AquaPulse Flood Node',
+              status: latest.status || 'SAFE',
+              last_seen: latest.recorded_at,
+              last_latitude: 37.7749,
+              last_longitude: -122.4194
+            }
+          ]);
         }
 
         const { data: alertData } = await supabase.from('alerts').select('*').order('created_at', { ascending: false });
-        if (alertData) {
-          fetchedAlerts = alertData;
+        if (alertData) setAlerts(alertData);
+        return;
+      }
+
+      // Fetch devices
+      const devRes = await fetch(`${API_BASE_URL}/device/list`);
+      if (devRes.ok) {
+        const devData = await devRes.json();
+        if (devData.length > 0) {
+          setDevices(devData);
         }
       }
 
-      // Try local FastAPI backend if Supabase has no logs and not blocked by Mixed Content
-      const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
-      if (!fetchedLogs && !isHttps) {
-        try {
-          const activeDevId = devices[0]?.device_id || 'DEV-ESP32-MAIN-001';
-          const histRes = await fetch(`${API_BASE_URL}/history?device_id=${activeDevId}&limit=30`);
-          if (histRes.ok) {
-            const histData = await histRes.json();
-            if (histData && histData.length > 0) fetchedLogs = histData;
-          }
-          const devRes = await fetch(`${API_BASE_URL}/device/list`);
-          if (devRes.ok) {
-            const devData = await devRes.json();
-            if (devData && devData.length > 0) fetchedDevices = devData;
-          }
-          const alertRes = await fetch(`${API_BASE_URL}/alerts`);
-          if (alertRes.ok) {
-            const alertData = await alertRes.json();
-            if (alertData) fetchedAlerts = alertData;
-          }
-        } catch (backendErr) {
-          // Backend offline - use local simulation
+      // Fetch history
+      const activeDevId = devices[0]?.device_id || 'DEV-ESP32-MAIN-001';
+      const histRes = await fetch(`${API_BASE_URL}/history?device_id=${activeDevId}&limit=20`);
+      if (histRes.ok) {
+        const histData = await histRes.json();
+        if (histData.length > 0) {
+          setStatusLogs(prev => prev.length === 0 || prev[0].id !== histData[0].id ? histData : prev);
         }
       }
 
-      // 1. Process Telemetry Logs every 7 seconds
-      const nowIso = new Date().toISOString();
-      if (fetchedLogs && fetchedLogs.length > 0) {
-        setStatusLogs(prev => {
-          const latestLog = fetchedLogs[0];
-          const isFresh = (new Date() - new Date(latestLog.recorded_at)) < 10000;
-          if (isFresh) {
-            return fetchedLogs.slice(0, 30);
-          }
-          // Attach live 7-second tick point matching current water level
-          const currentLevel = Math.max(0.0, Number((Number(latestLog.water_level_cm || 0)).toFixed(1)));
-          const liveTickPoint = {
-            id: `tick-${Date.now()}`,
-            device_id: latestLog.device_id || 'DEV-ESP32-MAIN-001',
-            water_level_cm: currentLevel,
-            status: currentLevel <= 17.0 ? 'SAFE' : currentLevel <= 20.0 ? 'RISKY' : 'DANGER',
-            wifi_rssi: latestLog.wifi_rssi || -72,
-            gps_speed: latestLog.gps_speed || 0,
-            recorded_at: nowIso
-          };
-          const existingIds = new Set([liveTickPoint.id, ...fetchedLogs.map(l => l.id)]);
-          const extraPrev = prev.filter(p => !existingIds.has(p.id));
-          const combined = [liveTickPoint, ...fetchedLogs, ...extraPrev].sort((a, b) => new Date(b.recorded_at) - new Date(a.recorded_at));
-          return combined.slice(0, 30);
-        });
-      } else {
-        // Continuous 7-second live stream fallback
-        setStatusLogs(prev => {
-          const lastVal = prev[0]?.water_level_cm != null ? Number(prev[0].water_level_cm) : 0.0;
-          const jitter = (Math.random() - 0.5) * 0.2;
-          const newLevel = Math.max(0.0, Number((lastVal + jitter).toFixed(1)));
-          const tick = {
-            id: `stream-${Date.now()}`,
-            device_id: 'DEV-ESP32-MAIN-001',
-            water_level_cm: newLevel,
-            status: newLevel <= 17.0 ? 'SAFE' : newLevel <= 20.0 ? 'RISKY' : 'DANGER',
-            wifi_rssi: -72,
-            gps_speed: 0,
-            recorded_at: nowIso
-          };
-          return [tick, ...prev.slice(0, 29)];
-        });
-      }
-
-      // 2. Process Devices
-      if (fetchedDevices && fetchedDevices.length > 0) {
-        setDevices(fetchedDevices.map(d => ({
-          ...d,
-          last_latitude: (d.last_latitude && Math.abs(d.last_latitude - 37.7749) > 0.01) ? d.last_latitude : 26.1133872,
-          last_longitude: (d.last_longitude && Math.abs(d.last_longitude - (-122.4194)) > 0.01) ? d.last_longitude : 91.5964305
-        })));
-      }
-
-      // 3. Process Alerts
-      if (fetchedAlerts) {
-        const latestStat = statusLogs && statusLogs.length > 0 ? statusLogs[0].status : 'SAFE';
-        if (latestStat === 'SAFE') {
-          setAlerts(fetchedAlerts.map(a => ({ ...a, resolved: true })));
-        } else {
-          setAlerts(fetchedAlerts);
-        }
+      // Fetch alerts
+      const alertRes = await fetch(`${API_BASE_URL}/alerts`);
+      if (alertRes.ok) {
+        const alertData = await alertRes.json();
+        setAlerts(prev => prev.length !== alertData.length || (alertData.length > 0 && prev[0]?.id !== alertData[0].id) ? alertData : prev);
       }
     } catch (error) {
-      console.warn('Telemetry sync fallback:', error);
+      console.warn('FastAPI backend offline. Operating in simulation mode with local states.');
     }
   };
 
   useEffect(() => {
     fetchData();
-
-    let channel;
-    if (isSupabaseConfigured) {
-      channel = supabase
-        .channel('realtime_website_data')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'status_logs' }, (payload) => {
-          if (payload.new) {
-            setStatusLogs(prev => [payload.new, ...prev.slice(0, 29)]);
-            setDevices(prev => prev.map(d => 
-              d.device_id === payload.new.device_id 
-                ? { ...d, status: payload.new.status, last_seen: payload.new.recorded_at }
-                : d
-            ));
-            if (payload.new.status === 'SAFE') {
-              setAlerts(prev => prev.map(a => ({ ...a, resolved: true })));
-            }
-          }
-        })
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'alerts' }, (payload) => {
-          if (payload.new) {
-            setAlerts(prev => [payload.new, ...prev]);
-          }
-        })
-        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'devices' }, (payload) => {
-          if (payload.new) {
-            setDevices(prev => prev.map(d => d.device_id === payload.new.device_id ? { ...d, ...payload.new } : d));
-          }
-        })
-        .subscribe();
-    }
-
-    const interval = setInterval(fetchData, 7000);
-    return () => {
-      clearInterval(interval);
-      if (channel) supabase.removeChannel(channel);
-    };
+    const interval = setInterval(fetchData, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   // Render Page Content based on tab ID

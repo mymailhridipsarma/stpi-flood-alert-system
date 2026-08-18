@@ -9,8 +9,6 @@ ApiClient::ApiClient(String url, String key) {
     apiKey = key;
     spiffsActive = false;
     cacheFilePath = "/offline_cache.jsonl";
-    telemetryQueue = NULL;
-    networkTaskHandle = NULL;
 }
 
 void ApiClient::begin() {
@@ -20,75 +18,6 @@ void ApiClient::begin() {
         Serial.println("[SPIFFS] Storage Mounted successfully.");
     } else {
         Serial.println("[SPIFFS] Mount failed! Offline cache disabled.");
-    }
-
-    // Create FreeRTOS queue & async upload worker pinned to Core 0
-    telemetryQueue = xQueueCreate(5, sizeof(TelemetryPayload));
-    if (telemetryQueue != NULL) {
-        xTaskCreatePinnedToCore(
-            networkTaskFunc,
-            "AsyncNetworkTask",
-            8192,
-            this,
-            1,
-            &networkTaskHandle,
-            0 // Pin to Core 0 so Core 1 is dedicated to real-time sensors
-        );
-        Serial.println("[API] Non-blocking FreeRTOS async upload task started on Core 0.");
-    }
-}
-
-bool ApiClient::queueTelemetry(TelemetryReport report) {
-    if (telemetryQueue == NULL) {
-        return sendTelemetry(report); // Fallback to sync if queue creation failed
-    }
-
-    TelemetryPayload payload;
-    memset(&payload, 0, sizeof(TelemetryPayload));
-    strncpy(payload.deviceId, report.deviceId.c_str(), sizeof(payload.deviceId) - 1);
-    payload.waterLevelCm = report.waterLevelCm;
-    strncpy(payload.status, report.status.c_str(), sizeof(payload.status) - 1);
-    payload.wifiRssi = report.wifiRssi;
-    payload.gpsSpeed = report.gpsSpeed;
-    payload.latitude = report.latitude;
-    payload.longitude = report.longitude;
-
-    // Push to queue non-blocking (0 timeout)
-    BaseType_t res = xQueueSend(telemetryQueue, &payload, 0);
-    if (res == pdTRUE) {
-        Serial.println("[API] Telemetry queued asynchronously (0ms blocking).");
-        return true;
-    } else {
-        Serial.println("[API] Telemetry queue full! Dropping old payload to prevent latency.");
-        return false;
-    }
-}
-
-void ApiClient::networkTaskFunc(void* parameter) {
-    ApiClient* client = (ApiClient*)parameter;
-    TelemetryPayload payload;
-
-    for (;;) {
-        if (xQueueReceive(client->telemetryQueue, &payload, portMAX_DELAY) == pdTRUE) {
-            esp_task_wdt_reset();
-
-            TelemetryReport report;
-            report.deviceId = String(payload.deviceId);
-            report.waterLevelCm = payload.waterLevelCm;
-            report.status = String(payload.status);
-            report.wifiRssi = payload.wifiRssi;
-            report.gpsSpeed = payload.gpsSpeed;
-            report.latitude = payload.latitude;
-            report.longitude = payload.longitude;
-
-            // Execute network calls asynchronously on Core 0
-            client->sendTelemetry(report);
-
-            if (payload.latitude != 0.0 && payload.longitude != 0.0) {
-                client->sendLocation(report.deviceId, payload.latitude, payload.longitude, payload.gpsSpeed);
-            }
-        }
-        vTaskDelay(pdMS_TO_TICKS(50));
     }
 }
 
@@ -105,7 +34,6 @@ bool ApiClient::sendTelemetry(TelemetryReport report) {
     HTTPClient http;
     String url = String(SUPABASE_REST_URL) + "/status_logs";
     http.begin(client, url);
-    http.setTimeout(1500); // 1.5s timeout prevents MCU lockup
     
     // Set headers for Supabase REST API
     http.addHeader("Content-Type", "application/json");
@@ -148,7 +76,6 @@ bool ApiClient::sendTelemetry(TelemetryReport report) {
         HTTPClient httpDev;
         String devUrl = String(SUPABASE_REST_URL) + "/devices?device_id=eq." + report.deviceId;
         httpDev.begin(client, devUrl);
-        httpDev.setTimeout(1500);
         httpDev.addHeader("Content-Type", "application/json");
         httpDev.addHeader("apikey", SUPABASE_ANON_KEY);
         httpDev.addHeader("Authorization", String("Bearer ") + String(SUPABASE_ANON_KEY));
@@ -159,24 +86,6 @@ bool ApiClient::sendTelemetry(TelemetryReport report) {
         serializeJson(devDoc, devJson);
         httpDev.sendRequest("PATCH", (uint8_t*)devJson.c_str(), devJson.length());
         httpDev.end();
-
-        // If status returns to SAFE, instantly resolve active emergency alerts in Supabase
-        if (report.status == "SAFE") {
-            HTTPClient httpAlert;
-            String alertUrl = String(SUPABASE_REST_URL) + "/alerts?device_id=eq." + report.deviceId + "&resolved=eq.false";
-            httpAlert.begin(client, alertUrl);
-            httpAlert.setTimeout(1500);
-            httpAlert.addHeader("Content-Type", "application/json");
-            httpAlert.addHeader("apikey", SUPABASE_ANON_KEY);
-            httpAlert.addHeader("Authorization", String("Bearer ") + String(SUPABASE_ANON_KEY));
-
-            JsonDocument alertDoc;
-            alertDoc["resolved"] = true;
-            String alertJson;
-            serializeJson(alertDoc, alertJson);
-            httpAlert.sendRequest("PATCH", (uint8_t*)alertJson.c_str(), alertJson.length());
-            httpAlert.end();
-        }
     }
 
     if (!success) {
@@ -199,7 +108,6 @@ bool ApiClient::sendLocation(String deviceId, double lat, double lng, float spee
                  "&speed=" + String(speed, 2);
                  
     http.begin(url);
-    http.setTimeout(1500);
     http.addHeader("x-device-key", apiKey);
 
     Serial.print("[API] Syncing coordinates: ");

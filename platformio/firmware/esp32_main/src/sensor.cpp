@@ -13,47 +13,37 @@ void UltrasonicSensor::begin() {
 }
 
 float UltrasonicSensor::readDistanceCm() {
-    float samples[3];
-    int validCount = 0;
+    // Clear trigger pin
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
 
-    for (int i = 0; i < 3; i++) {
-        // Clear trigger pin
-        digitalWrite(trigPin, LOW);
-        delayMicroseconds(2);
+    // Set trigger pin HIGH for 10 microseconds
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
 
-        // Set trigger pin HIGH for 10 microseconds
-        digitalWrite(trigPin, HIGH);
-        delayMicroseconds(10);
-        digitalWrite(trigPin, LOW);
+    // Read the echo pin travel duration in microseconds (timeout at ~30ms)
+    long duration = pulseIn(echoPin, HIGH, 30000);
 
-        // Read echo pin travel duration in microseconds (timeout at ~25ms)
-        long duration = pulseIn(echoPin, HIGH, 25000);
-
-        if (duration > 0) {
-            float dist = (duration * 0.0343) / 2.0;
-            if (dist < 2.0) {
-                samples[validCount++] = 0.0;
-            } else if (dist <= maxDistanceCm) {
-                samples[validCount++] = dist;
-            }
-        }
-        delay(4); // Short acoustic decay pause between burst samples
+    if (duration == 0) {
+        // Timeout means the target is too far away to echo back in time.
+        // For a flood sensor, "too far away" means NO WATER (Maximum Safe).
+        return maxDistanceCm;
     }
 
-    if (validCount == 0) {
-        return maxDistanceCm; // Safe default max height if out of range or timeout
+    // Sound speed = 340 m/s = 0.034 cm/microsecond
+    float distance = (duration * 0.0343) / 2.0;
+
+    // Check bounds
+    if (distance > maxDistanceCm) {
+        return maxDistanceCm; // Cap at max safe distance
+    }
+    
+    // If distance is extremely low (under 2cm), the object/water is practically touching the sensor.
+    // Return 0.0 rather than an error so the system registers it as maximum DANGER instead of UNKNOWN.
+    if (distance < 2.0) {
+        return 0.0;
     }
 
-    // Sort valid samples to obtain median value (filters noise spikes)
-    for (int i = 0; i < validCount - 1; i++) {
-        for (int j = i + 1; j < validCount; j++) {
-            if (samples[i] > samples[j]) {
-                float tmp = samples[i];
-                samples[i] = samples[j];
-                samples[j] = tmp;
-            }
-        }
-    }
-
-    return samples[validCount / 2];
+    return distance;
 }

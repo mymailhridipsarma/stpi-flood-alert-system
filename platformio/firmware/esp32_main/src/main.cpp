@@ -73,7 +73,7 @@ void loop() {
 
     unsigned long now = millis();
 
-    // 1. Measure water level every 500ms (high-speed real-time local indicator refresh)
+    // 1. Measure water level every 1 second
     if (now - lastSensorReadTime >= SENSOR_READ_INTERVAL) {
         lastSensorReadTime = now;
         
@@ -89,7 +89,7 @@ void loop() {
             currentStatus = STATUS_UNKNOWN;
         }
 
-        // Update indicators & sync LCD immediately on 500ms sensor read
+        // Update indicators & sync LCD immediately on every 200ms sensor read
         ledCtrl.setStatus(currentStatus);
         lcdCtrl.updateData(waterLevelCm, currentStatus, 0.0, 0.0, detectedObject, wifiMgr.getRSSI());
     }
@@ -97,7 +97,7 @@ void loop() {
     // Update buzzer siren (pulsing in Danger)
     buzzerCtrl.update(currentStatus == STATUS_DANGER);
 
-    // 2. Upload telemetry asynchronously (every 7 seconds) via FreeRTOS queue
+    // 2. Upload telemetry continuously (every 5 seconds)
     if (now - lastApiUploadTime >= API_UPLOAD_INTERVAL) {
         lastApiUploadTime = now;
 
@@ -118,8 +118,12 @@ void loop() {
         report.latitude = gpsData.latitude;
         report.longitude = gpsData.longitude;
 
-        // Perform non-blocking async queue push to Core 0 (takes 0ms on Core 1)
-        apiClient.queueTelemetry(report);
+        // Perform uploads
+        apiClient.sendTelemetry(report);
+
+        if (gpsData.isValid) {
+            apiClient.sendLocation(DEVICE_ID, gpsData.latitude, gpsData.longitude, gpsData.speedKmph);
+        }
 
         // Check and upload SPIFFS cache
         apiClient.uploadOfflineCache();

@@ -69,24 +69,3 @@ CREATE TRIGGER trigger_cleanup_status_logs
 INSERT INTO devices (device_id, name, status, last_latitude, last_longitude)
 VALUES ('DEV-ESP32-MAIN-001', 'Highway 101 Flood Node', 'ONLINE', 37.7749, -122.4194)
 ON CONFLICT (device_id) DO NOTHING;
-
--- Automatic Auto-Resolve Function for Active Emergency Alerts
-CREATE OR REPLACE FUNCTION auto_resolve_alerts_on_safe()
-RETURNS trigger AS $$
-BEGIN
-    IF NEW.status = 'SAFE' THEN
-        UPDATE alerts 
-        SET resolved = TRUE, resolved_at = NOW() 
-        WHERE device_id = NEW.device_id AND resolved = FALSE;
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Trigger to auto-resolve alerts when status log returns to SAFE
-DROP TRIGGER IF EXISTS trigger_auto_resolve_alerts ON status_logs;
-CREATE TRIGGER trigger_auto_resolve_alerts
-    AFTER INSERT ON status_logs
-    FOR EACH ROW
-    EXECUTE FUNCTION auto_resolve_alerts_on_safe();
-

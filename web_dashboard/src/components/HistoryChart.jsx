@@ -40,7 +40,7 @@ export default function HistoryChart({ data = [] }) {
             stroke="var(--text-secondary-color)" 
             fontSize={12} 
             tickLine={false}
-            domain={[-5, 'auto']}
+            domain={[-10, 'auto']}
           />
           <Tooltip 
             contentStyle={{ 
@@ -55,13 +55,15 @@ export default function HistoryChart({ data = [] }) {
             }} 
           />
           <Area 
-            type="monotone" 
+            type="natural" 
             dataKey="Water Level (cm)" 
             stroke="#0284c7" 
             strokeWidth={3}
             fillOpacity={1} 
             fill="url(#colorLevel)"
-            isAnimationActive={false}
+            isAnimationActive={true}
+            animationDuration={400}
+            animationEasing="ease-out"
           />
         </AreaChart>
       </ResponsiveContainer>
