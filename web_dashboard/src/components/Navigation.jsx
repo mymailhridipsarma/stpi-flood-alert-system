@@ -11,7 +11,8 @@ import {
   Menu,
   X,
   Sun,
-  Moon
+  Moon,
+  ShieldAlert
 } from 'lucide-react';
 
 const navItems = [
@@ -20,6 +21,7 @@ const navItems = [
   { id: 'analytics', name: 'Analytics', icon: BarChart3 },
   { id: 'history', name: 'History', icon: History },
   { id: 'status', name: 'Device Status', icon: Activity },
+  { id: 'alerts', name: 'Emergency Alerts', icon: ShieldAlert },
   { id: 'admin', name: 'Admin Control', icon: Settings },
   { id: 'creators', name: 'Creators Info', icon: Users },
 ];
