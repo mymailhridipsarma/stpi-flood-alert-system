@@ -41,7 +41,7 @@
 
 // Task Intervals (in milliseconds)
 #define SENSOR_READ_INTERVAL 50
-#define API_UPLOAD_INTERVAL 1000
+#define API_UPLOAD_INTERVAL 10000
 #define LCD_ROTATE_INTERVAL 5000
 #define WATCHDOG_TIMEOUT_S 12
 

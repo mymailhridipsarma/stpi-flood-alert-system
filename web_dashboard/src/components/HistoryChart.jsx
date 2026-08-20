@@ -16,7 +16,7 @@ export default function HistoryChart({ data = [] }) {
   const latestItem = data && data.length > 0 ? data[0] : null;
   const latestWaterLevel = latestItem?.water_level_cm != null ? Number(latestItem.water_level_cm) : 0;
 
-  // Keep the graph flowing continuously every 1 second, even if water level reading is static
+  // Keep the graph flowing continuously every 10 seconds, matching data input interval
   useEffect(() => {
     const updateFlow = () => {
       const now = new Date();
@@ -28,11 +28,11 @@ export default function HistoryChart({ data = [] }) {
           'Water Level (cm)': latestWaterLevel
         };
 
-        // Initialize timeline points on first render
+        // Initialize timeline points on first render (spaced 10 seconds apart)
         if (prev.length === 0) {
           const initialPoints = [];
           for (let i = 19; i >= 0; i--) {
-            const pastTime = new Date(now.getTime() - i * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const pastTime = new Date(now.getTime() - i * 10000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             const historicalVal = data && data[i] && data[i].water_level_cm != null ? Number(data[i].water_level_cm) : latestWaterLevel;
             initialPoints.push({
               time: pastTime,
@@ -49,7 +49,7 @@ export default function HistoryChart({ data = [] }) {
     };
 
     updateFlow();
-    const interval = setInterval(updateFlow, 1000);
+    const interval = setInterval(updateFlow, 10000);
     return () => clearInterval(interval);
   }, [latestWaterLevel]);
 

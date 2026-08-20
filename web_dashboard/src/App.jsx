@@ -162,7 +162,7 @@ export default function App() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 1000);
+    const interval = setInterval(fetchData, 10000);
 
     let channel = null;
     if (isSupabaseConfigured) {
